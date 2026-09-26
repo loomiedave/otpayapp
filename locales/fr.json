@@ -1,0 +1,87 @@
+{
+  "home": {
+    "welcome-back": "Bon retour",
+    "quick_actions": "Actions rapides",
+    "send_money": "Envoyer de l'argent",
+    "add": "Ajouter",
+    "my_activity": "Mon activité",
+    "recent_transactions": "Transactions récentes",
+    "see_all": "Voir tout",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier"
+  },
+  "send":{
+    "title": "Envoyer d'argen",
+     "recipient": "Bénéficiaire",
+     "addNew": "Ajouter un nouveau",
+     "noRecipients": "Aucun destinataire pour l'instant — ajoutez-en un pour envoyer de l'argent.",
+     "amount": "MONTANT",
+     "recipientGets": "Le destinataire reçoit",
+     "selectRecipient": "Sélectionnez un destinataire",
+     "fee": "Frais : {{fee}} {{currency}}",
+     "noFee": "Sans frais",
+     "corridorInactive": "{{from}} → {{to}} n'est pas encore disponible.",
+     "continue": "Continuer"
+  },
+  "sendReview": {
+      "title": "Transfert d'avis",
+      "isReceiving": "en train de recevoir",
+      "youSend": "Vous envoyez",
+      "transferFee": "Frais de transfert",
+      "exchangeRate": "Taux de change",
+      "total": "Total",
+      "confirm": "Confirmer et envoyer "
+    },
+  "rates": {
+    "live_rate": "Taux en direct",
+    "date_range_jan_dec": "Janvier à décembre",
+    "no_fee_transfer": "Aucun frais sur ce transfert",
+    "equals": "Égal à",
+    "coming_soon": "Bientôt disponible",
+    "view_other_rates": "Voir d'autres taux"
+  },
+  "status": {
+    "pending": "En attente",
+    "approved": "Approuvé",
+    "rejected": "Rejeté",
+    "fee": "Frais"
+  },
+  "nav": {
+    "home": "Accueil",
+    "recipients": "Bénéficiaires",
+    "transactions": "Transactions",
+    "more": "Plus"
+  },
+  "verification": {
+    "verify_account_prompt": "Vérifiez votre compte OtiPay en soumettant vos informations",
+    "choose_documents": "Choisissez parmi notre liste de documents acceptés",
+    "identity_verification": "Vérification d'identité",
+    "identity_verified": "Identité vérifiée"
+  },
+  "profile": {
+    "personal_details": "Informations personnelles",
+    "manage_personal_info": "Gérez vos informations personnelles",
+    "personal_information": "Informations personnelles",
+    "full_name": "Nom complet",
+    "date_of_birth": "Date de naissance",
+    "phone": "Téléphone",
+    "email": "E-mail",
+    "update_details_contact_us": "Pour mettre à jour vos informations personnelles, contactez-nous via le chat en direct"
+  },
+  "security": {
+    "title": "Sécurité",
+    "subtitle": "Code PIN, biométrie, appareils"
+  },
+  "support": {
+    "live_chat": "Chat en direct",
+    "talk_to_support": "Parlez à notre équipe d'assistance",
+    "help_and_contact": "Aide et contact",
+    "help_subtitle": "Consultez la FAQ, écrivez-nous ou appelez-nous",
+    "type_a_message": "Tapez un message"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Apparence, notifications, sécurité",
+    "sign_out": "Déconnexion"
+  }
+}

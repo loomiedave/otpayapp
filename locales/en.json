@@ -1,0 +1,87 @@
+{
+  "home": {
+    "welcome-back": "Welcome back",
+    "quick_actions": "Quick actions",
+    "send_money": "Send money",
+    "add": "Add",
+    "my_activity": "My activity",
+    "recent_transactions": "Recent transactions",
+    "see_all": "See all",
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
+  "send":{
+    "title": "Send money",
+     "recipient": "Recipient",
+      "addNew": "Add New",
+      "noRecipients": "No recipients yet — add one to send money.",
+      "amount": "AMOUNT",
+      "recipientGets": "Recipient gets",
+      "selectRecipient": "Select a recipient",
+      "fee": "Fee: {{fee}} {{currency}}",
+      "noFee": "No fee",
+      "corridorInactive": "{{from}} → {{to}} isn't live yet.",
+      "continue": "Continue"
+  },
+  "sendReview": {
+      "title": "Review Transfer",
+      "isReceiving": "is receiving",
+      "youSend": "You send",
+      "transferFee": "Transfer fee",
+      "exchangeRate": "Exchange rate",
+      "total": "Total",
+      "confirm": "Confirm & Send"
+    },
+  "rates": {
+    "live_rate": "Live rate",
+    "date_range_jan_dec": "January to December",
+    "no_fee_transfer": "No fee on this transfer",
+    "equals": "Equals",
+    "coming_soon": "Coming soon",
+    "view_other_rates": "View other rates"
+  },
+  "status": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "fee": "Fee"
+  },
+  "nav": {
+    "home": "Home",
+    "recipients": "Recipients",
+    "transactions": "Transactions",
+    "more": "More"
+  },
+  "verification": {
+    "verify_account_prompt": "Verify your OtiPay account by submitting your details",
+    "choose_documents": "Choose from our list of acceptable documents to submit",
+    "identity_verification": "Identity verification",
+    "identity_verified": "Identity verified"
+  },
+  "profile": {
+    "personal_details": "Personal details",
+    "manage_personal_info": "Manage your personal information",
+    "personal_information": "Personal information",
+    "full_name": "Full name",
+    "date_of_birth": "Date of birth",
+    "phone": "Phone",
+    "email": "Email",
+    "update_details_contact_us": "To update your personal details, contact us via Live chat"
+  },
+  "security": {
+    "title": "Security",
+    "subtitle": "Pin, biometrics, devices"
+  },
+  "support": {
+    "live_chat": "Live chat",
+    "talk_to_support": "Talk to our support team",
+    "help_and_contact": "Help and contact",
+    "help_subtitle": "Read FAQs, email and call us",
+    "type_a_message": "Type a message"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Appearance, notifications, security",
+    "sign_out": "Sign out"
+  }
+}
