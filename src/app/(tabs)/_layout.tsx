@@ -11,7 +11,7 @@ interface TabButtonProps {
 }
 
 
-function TabButton({ children, onPress, accessibilityState }: TabButtonProps): React.JSX.Element {
+function TabButton({ children, onPress }: TabButtonProps): React.JSX.Element {
   return (
     <Pressable
       onPress={onPress}

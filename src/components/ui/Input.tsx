@@ -17,6 +17,7 @@ interface InputProps extends TextInputProps {
 const Input = forwardRef<TextInput, InputProps>(
   ({ label, icon, error, hint, secureToggle, leftAccessory, rightAccessory, secureTextEntry, ...inputProps }, ref) => {
     const [hidden, setHidden] = useState<boolean>(!!secureTextEntry);
+    const [focused, setFocused] = useState<boolean>(false);
     const innerRef = useRef<TextInput>(null);
     const { isDark } = useTheme();
     const colors = useThemeColors();
@@ -43,10 +44,16 @@ const Input = forwardRef<TextInput, InputProps>(
         <View
           className="flex-row items-center px-3 rounded-md border"
           style={{
-            borderColor: error ? colors.danger : colors.borderMain,
+            height: 52,
+            borderColor: error ? colors.danger : focused ? colors.primary : colors.borderMain,
+            borderWidth: error || focused ? 1.5 : 1,
           }}
         >
-          {leftAccessory}
+          {leftAccessory && (
+            <View style={{ marginRight: 10, flexShrink: 0 }}>
+              {leftAccessory}
+            </View>
+          )}
           {icon && !leftAccessory && (
             <Feather name={icon} size={18} color={colors.iconMuted} style={{ marginRight: 8 }} />
           )}
@@ -64,12 +71,14 @@ const Input = forwardRef<TextInput, InputProps>(
             underlineColorAndroid="transparent"
             textAlignVertical="center"
             secureTextEntry={secureToggle ? hidden : secureTextEntry}
+            onFocus={(e) => { setFocused(true); inputProps.onFocus?.(e); }}
+            onBlur={(e) => { setFocused(false); inputProps.onBlur?.(e); }}
             {...inputProps}
             style={[
               { flex: 1, minWidth: 0 },
               Platform.OS === 'android'
-                ? { padding: 0, includeFontPadding: false, paddingVertical: 12 }
-                : { paddingVertical: 12 },
+                ? { padding: 0, includeFontPadding: false }
+                : { paddingVertical: 10 },
               inputProps.style,
             ]}
           />
@@ -79,7 +88,7 @@ const Input = forwardRef<TextInput, InputProps>(
               <Feather name={hidden ? 'eye-off' : 'eye'} size={18} color={colors.iconMuted} />
             </Pressable>
           )}
-          {rightAccessory}
+          {rightAccessory && <View style={{ marginLeft: 8, flexShrink: 0 }}>{rightAccessory}</View>}
         </View>
 
         {error ? (

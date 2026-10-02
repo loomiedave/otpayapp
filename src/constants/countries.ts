@@ -1,4 +1,4 @@
-export type CountryCode = string
+export type CountryCode = string;
 
 export interface Country {
   code: CountryCode;
@@ -15,3 +15,8 @@ export const COUNTRIES: Record<CountryCode, Country> = {
 };
 
 export const ALL_COUNTRY_CODES: CountryCode[] = ['NG', 'GH', 'TG', 'BJ'];
+
+// Countries actually usable for sending/receiving right now.
+// Everything else in ALL_COUNTRY_CODES still shows in pickers,
+// just greyed out with a "coming soon" label.
+export const SUPPORTED_COUNTRY_CODES: CountryCode[] = ['GH', 'TG'];

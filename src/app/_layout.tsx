@@ -62,6 +62,10 @@ function RootNavigator(): React.JSX.Element | null {
 
         <Stack.Protected guard={hasLaunched && !!session}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="add-recipient"
+            options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+          />
         </Stack.Protected>
       </Stack>
     </NavigationThemeProvider>

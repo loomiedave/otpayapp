@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import ScreenContainer from '../../../components/ui/ScreenContainer';
 import ScreenHeader from '../../../components/ui/ScreenHeader';
-import TextField from '../../../components/ui/TextField';
+import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -127,7 +127,7 @@ export default function SendReviewScreen(): React.JSX.Element {
       <Text className={isDark ? 'text-text-muted-dark text-xs mb-2 mt-6' : 'text-text-muted text-xs mb-2 mt-6'}>
         NUMBER TO CHARGE ({payerNetworkLabel.toUpperCase()})
       </Text>
-      <TextField
+      <Input
         placeholder="e.g. 0242439784"
         keyboardType="phone-pad"
         value={payerPhone}

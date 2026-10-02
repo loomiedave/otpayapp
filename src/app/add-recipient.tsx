@@ -1,33 +1,27 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import ScreenContainer from '../../../components/ui/ScreenContainer';
-import ScreenHeader from '../../../components/ui/ScreenHeader';
-import Input from '../../../components/ui/Input';
-import Button from '../../../components/ui/Button';
-import { useTheme } from '../../../contexts/ThemeContext';
-import { useAuth } from '../../../contexts/AuthContext';
+import ScreenContainer from '../components/ui/ScreenContainer';
+import ScreenHeader from '../components/ui/ScreenHeader';
+import Input from '../components/ui/Input';
+import Button from '../components/ui/Button';
+import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { COUNTRIES, CountryCode } from '@/constants/countries';
+import { COUNTRIES, CountryCode, SUPPORTED_COUNTRY_CODES } from '@/constants/countries';
 import { router } from 'expo-router';
-import { useExchangeRates } from '@/hooks/useExchangeRates';
 
 const ACCENT_GOLD = '#D4A62B';
 
 export default function AddRecipientScreen(): React.JSX.Element {
   const { isDark } = useTheme();
   const { session } = useAuth();
-  const { rates, loading: ratesLoading } = useExchangeRates();
 
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [country, setCountry] = useState<CountryCode | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const activeCountries = Array.from(
-    new Set(rates.filter((r) => r.is_active).flatMap((r) => [r.from, r.to]))
-  );
 
   const cardClass = isDark
     ? 'rounded-2xl bg-background-card-dark border border-border-main-dark'
@@ -44,7 +38,7 @@ export default function AddRecipientScreen(): React.JSX.Element {
       owner_id: session.user.id,
       full_name: fullName.trim(),
       country,
-      phone: phone.trim() || null,
+      phone: phone.trim(),
     });
 
     setSaving(false);
@@ -65,10 +59,18 @@ export default function AddRecipientScreen(): React.JSX.Element {
         COUNTRY
       </Text>
       <View className="flex-row flex-wrap" style={{ gap: 12 }}>
-        {activeCountries.map((code) => {
+        {Object.keys(COUNTRIES).map((code) => {
+          const isSupported = SUPPORTED_COUNTRY_CODES.includes(code as CountryCode);
           const isSelected = code === country;
+
           return (
-            <Pressable key={code} onPress={() => setCountry(code)} className="items-center">
+            <Pressable
+              key={code}
+              onPress={() => isSupported && setCountry(code as CountryCode)}
+              disabled={!isSupported}
+              className="items-center"
+              style={{ opacity: isSupported ? 1 : 0.4, width: 68 }}
+            >
               <View
                 className="w-14 h-14 rounded-full items-center justify-center mb-1"
                 style={{
@@ -77,35 +79,33 @@ export default function AddRecipientScreen(): React.JSX.Element {
                   borderColor: isSelected ? ACCENT_GOLD : isDark ? '#334155' : '#e2e8f0',
                 }}
               >
-                <Text className="text-xl">{COUNTRIES[code].flag}</Text>
+                <Text className="text-xl">{COUNTRIES[code as CountryCode].flag}</Text>
               </View>
               <Text
                 className={isDark ? 'text-text-muted-dark text-xs' : 'text-text-muted text-xs'}
                 numberOfLines={1}
-                style={{ maxWidth: 60 }}
               >
-                {COUNTRIES[code].name}
+                {COUNTRIES[code as CountryCode].name}
               </Text>
+              {!isSupported && (
+                <Text className="text-xs mt-0.5" style={{ color: isDark ? '#64748b' : '#94a3b8' }}>
+                  Coming soon
+                </Text>
+              )}
             </Pressable>
           );
         })}
       </View>
 
-      {!ratesLoading && activeCountries.length === 0 && (
-        <Text className={isDark ? 'text-text-muted-dark text-xs mt-3' : 'text-text-muted text-xs mt-3'}>
-          No countries are open for transfers right now.
-        </Text>
-      )}
-
       <Text className={isDark ? 'text-text-muted-dark text-xs mb-3 mt-8' : 'text-text-muted text-xs mb-3 mt-8'}>
         FULL NAME
       </Text>
-      <Input placeholder="e.g. Ama Boateng" value={fullName} onChangeText={setFullName} autoCapitalize="words" />
+      <Input placeholder="Enter recipient's name here" value={fullName} onChangeText={setFullName} autoCapitalize="words" />
 
       <Text className={isDark ? 'text-text-muted-dark text-xs mb-3 mt-6' : 'text-text-muted text-xs mb-3 mt-6'}>
         PHONE
       </Text>
-      <Input placeholder="e.g. +233 20 123 4567" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+      <Input placeholder="Reciepient's number" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
 
       {country && (
         <View className={`${cardClass} mt-6 p-4 flex-row items-center`}>
