@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import CountryFlag from 'react-native-country-flag';
 import ScreenContainer from '../../../components/ui/ScreenContainer';
 import ScreenHeader from '../../../components/ui/ScreenHeader';
-import Input from '../../../components/ui/Input';
+import TextField from '../../../components/ui/TextField';
 import Button from '../../../components/ui/Button';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -15,18 +14,12 @@ import { useTranslation } from 'react-i18next';
 
 const FLAT_FEE = 2.5; // mock fee, wire up to real pricing later
 
-// TODO: replace with your real business collection numbers
-const COLLECTION_NUMBERS: Record<string, string> = {
-  GH: '+233 XX XXX XXXX (MTN MoMo)',
-  TG: '+228 XX XXX XXXX (Flooz / T-Money)',
-};
-
 export default function SendReviewScreen(): React.JSX.Element {
   const { isDark } = useTheme();
   const { session } = useAuth();
   const { getCountry } = useCountries();
   const { t } = useTranslation();
-  const [reference, setReference] = useState('');
+  const [payerPhone, setPayerPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,7 +27,6 @@ export default function SendReviewScreen(): React.JSX.Element {
     recipientId: string;
     recipientName: string;
     recipientPhone: string;
-    recipientCountry: string;
     network: string;
     amount: string;
     fromCountry: string;
@@ -45,7 +37,6 @@ export default function SendReviewScreen(): React.JSX.Element {
 
   const fromCountry = getCountry(params.fromCountry);
   const toCountry = getCountry(params.toCountry);
-
   const numericAmount = parseFloat(params.amount) || 0;
   const total = numericAmount + FLAT_FEE;
 
@@ -60,42 +51,38 @@ export default function SendReviewScreen(): React.JSX.Element {
   const labelClass = isDark ? 'text-text-muted-dark text-sm' : 'text-text-muted text-sm';
   const valueClass = isDark ? 'text-text-main-dark font-semibold text-sm' : 'text-text-main font-semibold text-sm';
 
+  const payerNetworkLabel = params.fromCountry === 'GH' ? 'MTN MoMo' : 'Flooz / T-Money';
+
   const handleConfirm = async (): Promise<void> => {
-    if (!reference.trim() || !session?.user?.id) return;
+    if (!payerPhone.trim() || !session?.user?.id) return;
     setIsSubmitting(true);
     setError(null);
 
-    const { data, error: insertError } = await supabase
-      .from('transfers')
-      .insert({
-        sender_id: session.user.id,
-        recipient_id: params.recipientId,
-        recipient_name: params.recipientName,
-        recipient_phone: params.recipientPhone,
-        from_country: params.fromCountry,
-        to_country: params.toCountry,
+    const { data, error: fnError } = await supabase.functions.invoke('initiate-transfer', {
+      body: {
+        senderId: session.user.id,
+        recipientId: params.recipientId,
+        recipientName: params.recipientName,
+        recipientPhone: params.recipientPhone,
+        payerPhone: payerPhone.trim(), // the number that gets the payment prompt — NOT the recipient's
+        fromCountry: params.fromCountry,
+        toCountry: params.toCountry,
         network: params.network,
-        amount_sent: numericAmount,
+        amountSent: numericAmount,
         fee: FLAT_FEE,
-        rate_used: parseFloat(params.rate),
-        amount_received: parseFloat(params.convertedAmount),
-        collection_reference: reference.trim(),
-        status: 'pending_verification',
-      })
-      .select()
-      .single();
+        rateUsed: parseFloat(params.rate),
+        amountReceived: parseFloat(params.convertedAmount),
+      },
+    });
 
     setIsSubmitting(false);
 
-    if (insertError || !data) {
-      setError('Could not submit transfer. Try again.');
+    if (fnError || !data?.transferId) {
+      setError('Could not start transfer. Try again.');
       return;
     }
 
-    router.replace({
-      pathname: '/home/send-success',
-      params: { transferId: data.id },
-    });
+    router.replace({ pathname: '/home/send-waiting', params: { transferId: data.transferId } });
   };
 
   return (
@@ -117,33 +104,38 @@ export default function SendReviewScreen(): React.JSX.Element {
       <View className={`${cardClass} px-4`}>
         <View className={rowClass}>
           <Text className={labelClass}>{t('sendReview.youSend')}</Text>
-          <Text className={valueClass}>{formatRate(numericAmount)} {fromCountry.currency_code}</Text>
+          <Text className={valueClass}>
+            {formatRate(numericAmount)} {fromCountry.currency_code}
+          </Text>
         </View>
         <View className={rowClass}>
           <Text className={labelClass}>{t('sendReview.transferFee')}</Text>
-          <Text className={valueClass}>{formatRate(FLAT_FEE)} {fromCountry.currency_code}</Text>
+          <Text className={valueClass}>
+            {formatRate(FLAT_FEE)} {fromCountry.currency_code}
+          </Text>
         </View>
         <View className="flex-row items-center justify-between py-3">
-          <Text className={isDark ? 'text-text-main-dark font-bold' : 'text-text-main font-bold'}>{t('sendReview.total')}</Text>
+          <Text className={isDark ? 'text-text-main-dark font-bold' : 'text-text-main font-bold'}>
+            {t('sendReview.total')}
+          </Text>
           <Text className={isDark ? 'text-text-main-dark font-bold' : 'text-text-main font-bold'}>
             {formatRate(total)} {fromCountry.currency_code}
           </Text>
         </View>
       </View>
 
-      <View className={`${cardClass} mt-4 p-4`}>
-        <Text className={isDark ? 'text-text-main-dark font-semibold text-sm mb-1' : 'text-text-main font-semibold text-sm mb-1'}>
-          Send {formatRate(total)} {fromCountry.currency_code} to
-        </Text>
-        <Text className={isDark ? 'text-text-muted-dark text-sm' : 'text-text-muted text-sm'}>
-          {COLLECTION_NUMBERS[params.fromCountry]}
-        </Text>
-      </View>
-
       <Text className={isDark ? 'text-text-muted-dark text-xs mb-2 mt-6' : 'text-text-muted text-xs mb-2 mt-6'}>
-        TRANSACTION ID FROM YOUR PAYMENT
+        NUMBER TO CHARGE ({payerNetworkLabel.toUpperCase()})
       </Text>
-      <Input placeholder="e.g. MP240916.1234.A56789" value={reference} onChangeText={setReference} />
+      <TextField
+        placeholder="e.g. 0242439784"
+        keyboardType="phone-pad"
+        value={payerPhone}
+        onChangeText={setPayerPhone}
+      />
+      <Text className={isDark ? 'text-text-muted-dark text-xs mt-2' : 'text-text-muted text-xs mt-2'}>
+        You'll get a prompt on this number to approve the payment.
+      </Text>
 
       {error && (
         <Text className="text-xs mt-3" style={{ color: '#ef4444' }}>
@@ -156,7 +148,7 @@ export default function SendReviewScreen(): React.JSX.Element {
           label={t('sendReview.confirm')}
           onPress={handleConfirm}
           loading={isSubmitting}
-          disabled={!reference.trim()}
+          disabled={!payerPhone.trim()}
         />
       </View>
     </ScreenContainer>
