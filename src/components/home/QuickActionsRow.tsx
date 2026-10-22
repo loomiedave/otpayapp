@@ -55,11 +55,11 @@ export default function QuickActionsRow(): React.JSX.Element {
       <ActionItem
         icon="users"
         label="Add"
-        onPress={() => router.push('/add-recipient' as never)}
+        onPress={() => router.push('/(tabs)/recipients/add-recipient' as never)}
       />
       <ActionItem
         icon="clock"
-        label="Activity"
+        label="Transactions"
         onPress={() => router.push('/(tabs)/transactions' as never)}
       />
     </View>

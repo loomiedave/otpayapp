@@ -1,23 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import ScreenContainer from '../../../components/ui/ScreenContainer';
-import ScreenHeader from '../../../components/ui/ScreenHeader';
-import Button from '../../../components/ui/Button';
-import RecipientPicker from '@/components/send/RecipientPicker';
-import PhoneField from '@/components/send/PhoneField';
-import AmountField from '@/components/send/AmountField';
-import ConversionSummary from '@/components/send/ConversionSummary';
-import NetworkSelector, { getRequiredNetwork, type Network } from '@/components/send/NetworkSelector';
-import CorridorNotice from '@/components/send/CorridorNotice';
-import { useTheme } from '../../../contexts/ThemeContext';
-import { useAuth } from '../../../contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
-import { useCountries } from '@/hooks/useCountries';
-import { useExchangeRates } from '@/hooks/useExchangeRates';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ActivityIndicator } from 'react-native';
+
+import { supabase } from '@/lib/supabase';
+
+import { Feather } from '@expo/vector-icons';
+
 import { SUPPORTED_COUNTRY_CODES } from '@/constants/countries';
+
+import { useAuth } from '../../../contexts/AuthContext';
+import { useTheme } from '../../../contexts/ThemeContext';
+
+import { useCountries } from '@/hooks/useCountries';
+import { useExchangeRates } from '@/hooks/useExchangeRates';
+
+import Button from '../../../components/ui/Button';
+import ScreenHeader from '../../../components/ui/ScreenHeader';
+import ScreenContainer from '../../../components/ui/ScreenContainer';
+
+import PhoneField from '@/components/send/PhoneField';
+import AmountField from '@/components/send/AmountField';
+import CorridorNotice from '@/components/send/CorridorNotice';
+import RecipientPicker from '@/components/send/RecipientPicker';
+import ConversionSummary from '@/components/send/ConversionSummary';
+import NetworkSelector, { getRequiredNetwork, type Network } from '@/components/send/NetworkSelector';
 
 interface Recipient {
   id: string;
@@ -29,19 +36,21 @@ interface Recipient {
 export default function SendScreen(): React.JSX.Element {
   const { isDark } = useTheme();
   const { session } = useAuth();
+  const { t } = useTranslation();
   const { rates, loading: ratesLoading } = useExchangeRates();
   const { getCountry, loading: countriesLoading } = useCountries();
-  const { t } = useTranslation();
+
+  const [phone, setPhone] = useState<string>('');
+  const [amount, setAmount] = useState<string>('');
+  const [network, setNetwork] = useState<Network | null>(null);
+
+  const [fromCountry, setFromCountry] = useState<string>('GH');
+  const [manualCountry, setManualCountry] = useState<string>('TG');
 
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [recipientsLoading, setRecipientsLoading] = useState(true);
   const [recipientsError, setRecipientsError] = useState<string | null>(null);
   const [selectedRecipientId, setSelectedRecipientId] = useState<string | null>(null);
-  const [phone, setPhone] = useState<string>('');
-  const [manualCountry, setManualCountry] = useState<string>('TG');
-  const [amount, setAmount] = useState<string>('');
-  const [fromCountry, setFromCountry] = useState<string>('GH');
-  const [network, setNetwork] = useState<Network | null>(null);
 
   const loadRecipients = () => {
     if (!session?.user?.id) return;
@@ -74,8 +83,6 @@ export default function SendScreen(): React.JSX.Element {
   const selectedRecipient = recipients.find((r) => r.id === selectedRecipientId);
   const toCountry: string | null = selectedRecipient ? selectedRecipient.country : manualCountry;
 
-  // Auto-select network when there's exactly one option (e.g. GH -> MTN only);
-  // clear it when switching to a corridor requiring an explicit pick, or none at all.
   useEffect(() => {
     const options = getRequiredNetwork(toCountry);
     if (options && options.length === 1) {
@@ -99,8 +106,8 @@ export default function SendScreen(): React.JSX.Element {
   };
 
   const cycleManualCountry = () => {
-    const next = (SUPPORTED_COUNTRY_CODES.indexOf(manualCountry) + 1) % SUPPORTED_COUNTRY_CODES.length;
-    setManualCountry(SUPPORTED_COUNTRY_CODES[next]);
+    setManualCountry(nextCountryCode(toCountry ?? manualCountry)); // or your original index code
+    setSelectedRecipientId(null); // switch to manual mode
   };
 
   const cycleFromCountry = () => {

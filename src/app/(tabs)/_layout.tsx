@@ -59,10 +59,17 @@ export default function TabsLayout(): React.JSX.Element {
         }}
       />
       <Tabs.Screen
+        name="markets"
+        options={{
+          title: 'Markets',
+          tabBarIcon: ({ color, size }) => <Feather name="activity" size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="transactions"
         options={{
           title: 'Transactions',
-          tabBarIcon: ({ color, size }) => <Feather name="activity" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Feather name="calendar" size={size} color={color} />,
         }}
       />
       <Tabs.Screen

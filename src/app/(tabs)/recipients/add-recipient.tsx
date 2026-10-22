@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import ScreenContainer from '../components/ui/ScreenContainer';
-import ScreenHeader from '../components/ui/ScreenHeader';
-import Input from '../components/ui/Input';
-import Button from '../components/ui/Button';
-import { useTheme } from '../contexts/ThemeContext';
-import { useAuth } from '../contexts/AuthContext';
+import ScreenContainer from '../../../components/ui/ScreenContainer';
+import ScreenHeader from '../../../components/ui/ScreenHeader';
+import Input from '../../../components/ui/Input';
+import Button from '../../../components/ui/Button';
+import { useTheme } from '../../../contexts/ThemeContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { COUNTRIES, CountryCode, SUPPORTED_COUNTRY_CODES } from '@/constants/countries';
 import { router } from 'expo-router';

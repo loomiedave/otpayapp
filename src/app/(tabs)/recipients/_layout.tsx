@@ -5,5 +5,13 @@ export const unstable_settings = {
 };
 
 export default function RecipientsScreenLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <Stack
+      initialRouteName="index"
+      screenOptions={{ headerShown: false }}
+    >
+      <Stack.Screen name="index" />
+      <Stack.Screen name="add-recipient" />
+    </Stack>
+  );
 }

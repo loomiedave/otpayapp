@@ -81,9 +81,9 @@ export default function RecipientsScreen(): React.JSX.Element {
 
   return (
     <ScreenContainer scroll>
-      <ScreenHeader title="Recipients" />
+      {/* <ScreenHeader title="Recipients" /> */}
       <Pressable
-        onPress={() => router.push('/add-recipient')}
+        onPress={() => router.push('/(tabs)/recipients/add-recipient')}
         className={
           isDark
             ? 'flex-row items-center p-4 rounded-2xl border border-dashed border-border-main-dark mb-6 active:opacity-70'
