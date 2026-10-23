@@ -245,7 +245,7 @@ export default function TransactionDetailScreen(): React.JSX.Element {
           <>
             <Feather name="image" size={16} color={isDark ? '#e2e8f0' : '#334155'} style={{ marginRight: 8 }} />
             <Text className={isDark ? 'text-text-main-dark text-sm font-semibold' : 'text-text-main text-sm font-semibold'}>
-              Share as Image
+              Share Receipt
             </Text>
           </>
         )}

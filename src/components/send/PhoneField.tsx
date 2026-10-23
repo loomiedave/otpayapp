@@ -35,23 +35,19 @@ export default function PhoneField({
         value={phone}
         onChangeText={onChangePhone}
         leftAccessory={
-          isUsingRecipient ? (
-            <View className="flex-row items-center">
-              <CountryFlag isoCode={getCountry(manualCountry).code} size={16} />
+          <Pressable onPress={onCycleManualCountry} hitSlop={8} className="flex-row items-center">
+            <CountryFlag isoCode={getCountry(manualCountry).code} size={16} />
+            {isUsingRecipient && (
               <View
-                    style={{
-                      width: 1,
-                      height: 16,
-                      backgroundColor: isDark ? '#334155' : '#e2e8f0',
-                      marginHorizontal: 8,
-                    }}
-                  />
-            </View>
-          ) : (
-            <Pressable onPress={onCycleManualCountry} className="flex-row items-center">
-              <CountryFlag isoCode={getCountry(manualCountry).code} size={16} />
-            </Pressable>
-          )
+                style={{
+                  width: 1,
+                  height: 16,
+                  backgroundColor: isDark ? '#334155' : '#e2e8f0',
+                  marginHorizontal: 8,
+                }}
+              />
+            )}
+          </Pressable>
         }
       />
     </>

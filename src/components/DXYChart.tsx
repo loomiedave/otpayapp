@@ -39,7 +39,7 @@ export default function DXYChart() {
 
       const json = await response.json();
 
-      console.log("DXY:", json);
+      // console.log("DXY:", json);
 
       setData(json);
     } catch (error) {

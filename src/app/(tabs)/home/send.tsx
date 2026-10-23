@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 
 import { supabase } from '@/lib/supabase';
+import { detectNetwork } from '@/lib/send/networkDetection';
 
 import { Feather } from '@expo/vector-icons';
 
@@ -16,6 +17,7 @@ import { useCountries } from '@/hooks/useCountries';
 import { useExchangeRates } from '@/hooks/useExchangeRates';
 
 import Button from '../../../components/ui/Button';
+import Input from '../../../components/ui/Input';
 import ScreenHeader from '../../../components/ui/ScreenHeader';
 import ScreenContainer from '../../../components/ui/ScreenContainer';
 
@@ -24,7 +26,7 @@ import AmountField from '@/components/send/AmountField';
 import CorridorNotice from '@/components/send/CorridorNotice';
 import RecipientPicker from '@/components/send/RecipientPicker';
 import ConversionSummary from '@/components/send/ConversionSummary';
-import NetworkSelector, { getRequiredNetwork, type Network } from '@/components/send/NetworkSelector';
+import { getRequiredNetwork } from '@/components/send/NetworkSelector';
 
 interface Recipient {
   id: string;
@@ -32,6 +34,9 @@ interface Recipient {
   country: string;
   phone: string | null;
 }
+
+const nextCountryCode = (current: string): string =>
+  SUPPORTED_COUNTRY_CODES[(SUPPORTED_COUNTRY_CODES.indexOf(current) + 1) % SUPPORTED_COUNTRY_CODES.length];
 
 export default function SendScreen(): React.JSX.Element {
   const { isDark } = useTheme();
@@ -42,7 +47,7 @@ export default function SendScreen(): React.JSX.Element {
 
   const [phone, setPhone] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
-  const [network, setNetwork] = useState<Network | null>(null);
+  const [manualName, setManualName] = useState<string>('');
 
   const [fromCountry, setFromCountry] = useState<string>('GH');
   const [manualCountry, setManualCountry] = useState<string>('TG');
@@ -83,14 +88,11 @@ export default function SendScreen(): React.JSX.Element {
   const selectedRecipient = recipients.find((r) => r.id === selectedRecipientId);
   const toCountry: string | null = selectedRecipient ? selectedRecipient.country : manualCountry;
 
-  useEffect(() => {
-    const options = getRequiredNetwork(toCountry);
-    if (options && options.length === 1) {
-      setNetwork(options[0].value);
-    } else {
-      setNetwork(null);
-    }
-  }, [toCountry]);
+  // Network is decided by the app (lib/send/networkDetection.ts), not by the user.
+  const network = detectNetwork(toCountry, phone);
+  const networkOptions = getRequiredNetwork(toCountry);
+  const needsNetwork = !!networkOptions;
+  const networkLabel = networkOptions?.find((o) => o.value === network)?.label ?? null;
 
   const handleSelectRecipient = (r: Recipient) => {
     setSelectedRecipientId(r.id);
@@ -106,28 +108,41 @@ export default function SendScreen(): React.JSX.Element {
   };
 
   const cycleManualCountry = () => {
-    setManualCountry(nextCountryCode(toCountry ?? manualCountry)); // or your original index code
-    setSelectedRecipientId(null); // switch to manual mode
+    setManualCountry(nextCountryCode(toCountry ?? manualCountry));
+    setSelectedRecipientId(null);
   };
 
   const cycleFromCountry = () => {
-    const next = (SUPPORTED_COUNTRY_CODES.indexOf(fromCountry) + 1) % SUPPORTED_COUNTRY_CODES.length;
-    setFromCountry(SUPPORTED_COUNTRY_CODES[next]);
+    setFromCountry(nextCountryCode(fromCountry));
   };
 
+  // --- money ---
   const numericAmount = parseFloat(amount) || 0;
   const selectedRate = toCountry ? rates.find((r) => r.from === fromCountry && r.to === toCountry) : undefined;
-  const rate = selectedRate?.rate ?? 0;
-  const fee = selectedRate?.fee ?? 0;
-  const convertedAmount = Math.max(numericAmount - fee, 0) * rate;
+  const rate = Number(selectedRate?.rate ?? 0);
+  const fee = Number(selectedRate?.fee ?? 0);
   const corridorActive = selectedRate?.is_active ?? false;
+
+  // Round once, at the end, to the destination currency (XOF = 0 decimals, others = 2).
+  const decimals = toCountry && getCountry(toCountry)?.currency_code === 'XOF' ? 0 : 2;
+  const factor = 10 ** decimals;
+  const netCents = Math.max(Math.round(numericAmount * 100) - Math.round(fee * 100), 0);
+  const convertedAmount = Math.round((netCents / 100) * rate * factor) / factor;
 
   const cardClass = isDark
     ? 'rounded-2xl bg-background-card-dark border border-border-main-dark'
     : 'rounded-2xl bg-background-card border border-border-main';
 
-  const networkRequired = (getRequiredNetwork(toCountry)?.length ?? 0) > 1;
-  const canContinue = !!phone && !!toCountry && numericAmount > 0 && corridorActive && (!networkRequired || !!network);
+  const recipientName = selectedRecipient ? selectedRecipient.full_name : manualName.trim();
+
+  const canContinue =
+    !!phone &&
+    !!toCountry &&
+    !!recipientName &&
+    numericAmount > fee &&
+    convertedAmount > 0 &&
+    corridorActive &&
+    (!needsNetwork || !!network);
 
   const handleContinue = (): void => {
     if (!canContinue || !toCountry) return;
@@ -136,7 +151,7 @@ export default function SendScreen(): React.JSX.Element {
       pathname: '/home/send-review',
       params: {
         recipientId: selectedRecipient?.id ?? '',
-        recipientName: selectedRecipient?.full_name ?? '',
+        recipientName,
         recipientPhone: phone,
         recipientCountry: toCountry,
         network: network ?? '',
@@ -190,6 +205,19 @@ export default function SendScreen(): React.JSX.Element {
         t={t}
       />
 
+      {!selectedRecipient && (
+        <>
+          <Text className={isDark ? 'text-text-muted-dark text-xs mb-3 mt-8' : 'text-text-muted text-xs mb-3 mt-8'}>
+            {t('send.recipientName', { defaultValue: 'Recipient name' })}
+          </Text>
+          <Input
+            placeholder={t('send.recipientNamePlaceholder', { defaultValue: 'Full name' })}
+            value={manualName}
+            onChangeText={setManualName}
+          />
+        </>
+      )}
+
       <PhoneField
         phone={phone}
         onChangePhone={handleChangePhone}
@@ -200,6 +228,20 @@ export default function SendScreen(): React.JSX.Element {
         isDark={isDark}
         t={t}
       />
+
+      {needsNetwork && (
+        <View className="mt-3">
+          {networkLabel ? (
+            <Text className={isDark ? 'text-text-muted-dark text-xs' : 'text-text-muted text-xs'}>
+              {t('send.network', { defaultValue: 'Network' })}: {networkLabel}
+            </Text>
+          ) : phone.replace(/\D/g, '').length >= 2 ? (
+            <Text style={{ color: isDark ? '#f87171' : '#dc2626', fontSize: 12 }}>
+              {t('send.networkNotSupported', { defaultValue: 'This phone number is not supported.' })}
+            </Text>
+          ) : null}
+        </View>
+      )}
 
       <AmountField
         amount={amount}
@@ -222,8 +264,6 @@ export default function SendScreen(): React.JSX.Element {
         t={t}
         cardClass={cardClass}
       />
-
-      <NetworkSelector toCountry={toCountry} network={network} setNetwork={setNetwork} cardClass={cardClass} isDark={isDark} t={t} />
 
       <CorridorNotice
         show={!!toCountry && !corridorActive}
