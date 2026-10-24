@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
 import { Tabs } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
+import { View, Text, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { useTranslation } from 'react-i18next';
 
 const NAVY = '#0E2F6B';
 const GOLD = '#D4A62B';
@@ -116,40 +118,42 @@ function CustomTabBar({ state, descriptors, navigation }: TabBarProps): React.JS
 }
 
 export default function TabsLayout(): React.JSX.Element {
+  const { t } = useTranslation()
+
   return (
     <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <CustomTabBar {...props} />}>
       <Tabs.Screen
-        name="home"
+        name='home'
         options={{
-          title: 'Home',
+          title: `${t('nav.home')}`,
           tabBarIcon: ({ color, size }) => <Feather name="home" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="recipients"
         options={{
-          title: 'Recipients',
+          title: `${t('nav.recipients')}`,
           tabBarIcon: ({ color, size }) => <Feather name="users" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="markets"
         options={{
-          title: 'Markets',
+          title: `${t('nav.markets')}`,
           tabBarIcon: ({ color, size }) => <Feather name="activity" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="transactions"
         options={{
-          title: 'Transactions',
+          title: `${t('nav.transactions')}`,
           tabBarIcon: ({ color, size }) => <Feather name="calendar" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="more"
         options={{
-          title: 'More',
+          title: `${t('nav.more')}`,
           tabBarIcon: ({ color, size }) => <Feather name="align-justify" size={size} color={color} />,
         }}
       />

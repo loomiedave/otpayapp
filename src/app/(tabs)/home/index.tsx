@@ -1,23 +1,32 @@
 import React, { useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
-import ScreenContainer from '@/components/ui/ScreenContainer';
-import HomeHeader from '@/components/home/HomeHeader';
-import RateHero from '@/components/home/RateHero';
-import RateTicker from '@/components/home/RateTicker';
-import QuickActionsRow from '@/components/home/QuickActionsRow';
-import PromoCarousel from '@/components/home/PromoCarousel';
-import { useTheme } from '@/contexts/ThemeContext';
+import { View, Text } from 'react-native';
+
+import { useTranslation } from 'react-i18next';
+
 import { useAuth } from '@/contexts/AuthContext';
-import { useExchangeRates } from '@/hooks/useExchangeRates';
+import { useTheme } from '@/contexts/ThemeContext';
+
 import { CountryCode } from '@/constants/countries';
+
+import { useExchangeRates } from '@/hooks/useExchangeRates';
+
+import Loading from '@/components/ui/Loading';
+import RateHero from '@/components/home/RateHero';
+import HomeHeader from '@/components/home/HomeHeader';
+import RateTicker from '@/components/home/RateTicker';
+import PromoCarousel from '@/components/home/PromoCarousel';
+import ScreenContainer from '@/components/ui/ScreenContainer';
+import QuickActionsRow from '@/components/home/QuickActionsRow';
 import RecentTransactions from '@/components/home/RecentTransactions';
 
 export default function HomeScreen(): React.JSX.Element {
   const { isDark } = useTheme();
   const { session } = useAuth();
-  const [from, setFrom] = useState<CountryCode>('GH');
-  const [to, setTo] = useState<CountryCode>('NG');
+  const { t } = useTranslation();
   const { rates, loading } = useExchangeRates();
+  const [to, setTo] = useState<CountryCode>('NG');
+  const [from, setFrom] = useState<CountryCode>('GH');
+
 
   const metadata = session?.user?.user_metadata as { first_name?: string } | undefined;
   const userName = metadata?.first_name ?? 'there';
@@ -36,11 +45,7 @@ export default function HomeScreen(): React.JSX.Element {
 
   if (loading) {
     return (
-      <ScreenContainer paddingHorizontal={false} edges={['top']}>
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator />
-        </View>
-      </ScreenContainer>
+      <Loading />
     );
   }
 
@@ -69,7 +74,7 @@ export default function HomeScreen(): React.JSX.Element {
               : 'text-text-main font-bold text-lg mb-4 px-6'
           }
         >
-          Quick Actions
+          {t('home.quick_actions')}
         </Text>
         <QuickActionsRow />
       </View>

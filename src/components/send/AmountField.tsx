@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
 import CountryFlag from 'react-native-country-flag';
+import { View, Text, Pressable } from 'react-native';
+
 import Input from '../ui/Input';
 
 interface AmountFieldProps {

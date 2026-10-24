@@ -1,19 +1,21 @@
-import { Platform } from 'react-native';
-import { enableScreens } from 'react-native-screens';
-
 import '../../i18n';
 import './global.css';
-import React, { useEffect } from 'react';
+
 import { Stack } from 'expo-router';
-import { ThemeProvider as NavigationThemeProvider, DefaultTheme, DarkTheme } from 'expo-router/react-navigation';
+import { Platform } from 'react-native';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
-import { ThemeProvider as AppThemeProvider, useTheme } from '../contexts/ThemeContext';
-import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import { enableScreens } from 'react-native-screens';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ExchangeRatesProvider } from '@/contexts/ExchangeRatesContext';
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+import { ThemeProvider as NavigationThemeProvider, DefaultTheme, DarkTheme } from 'expo-router/react-navigation';
+
 import { useHasLaunched } from '@/lib/onboardingStore';
+
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { ExchangeRatesProvider } from '@/contexts/ExchangeRatesContext';
+import { ThemeProvider as AppThemeProvider, useTheme } from '@/contexts/ThemeContext';
 
 if (Platform.OS === 'web') {
   enableScreens(false);
@@ -24,8 +26,8 @@ configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
 
 function RootNavigator(): React.JSX.Element | null {
   const { isDark } = useTheme();
-  const { session, isLoading: authLoading } = useAuth();
   const hasLaunched = useHasLaunched();
+  const { session, isLoading: authLoading } = useAuth();
 
   const backgroundColor = isDark ? '#0f172a' : '#f8fafc';
   const AppTheme = {
@@ -62,10 +64,6 @@ function RootNavigator(): React.JSX.Element | null {
 
         <Stack.Protected guard={hasLaunched && !!session}>
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen
-            name="add-recipient"
-            options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
-          />
         </Stack.Protected>
       </Stack>
     </NavigationThemeProvider>

@@ -1,17 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { View, Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import ScreenContainer from '../../../components/ui/ScreenContainer';
-import Button from '../../../components/ui/Button';
-import { useTheme } from '../../../contexts/ThemeContext';
+import React, { useEffect, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+
 import { supabase } from '@/lib/supabase';
+
+import { useTranslation } from 'react-i18next';
+
+import { useTheme } from '@/contexts/ThemeContext';
+
+import Button from '@/components/ui/Button';
+import Loading from '@/components/ui/Loading';
+import ScreenContainer from '@/components/ui/ScreenContainer';
 
 export default function SendFailedScreen(): React.JSX.Element {
   const { isDark } = useTheme();
-  const { transferId } = useLocalSearchParams<{ transferId: string }>();
-  const [recipientName, setRecipientName] = useState('');
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
+  const [recipientName, setRecipientName] = useState('');
+  const { transferId } = useLocalSearchParams<{ transferId: string }>();
 
   useEffect(() => {
     if (!transferId) return;
@@ -32,11 +39,7 @@ export default function SendFailedScreen(): React.JSX.Element {
 
   if (loading) {
     return (
-      <ScreenContainer>
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator />
-        </View>
-      </ScreenContainer>
+     <Loading />
     );
   }
 
@@ -55,7 +58,7 @@ export default function SendFailedScreen(): React.JSX.Element {
             isDark ? 'text-2xl font-bold text-text-main-dark text-center mb-2' : 'text-2xl font-bold text-text-main text-center mb-2'
           }
         >
-          Transfer Failed
+          {t('send.failed')}
         </Text>
         <Text
           className={
@@ -65,12 +68,12 @@ export default function SendFailedScreen(): React.JSX.Element {
           }
         >
           {recipientName
-            ? `We couldn't complete the transfer to ${recipientName}. Nothing was charged beyond what the payment network attempted.`
-            : "We couldn't complete this transfer."}
+            ? `${t('send.could_not_complete_to')} ${recipientName}. ${t('send.no_charge')}`
+            : `${t('send.could_not_complete')}`}
         </Text>
 
         <View className="w-full">
-          <Button label="Try Again" onPress={handleTryAgain} />
+          <Button label={t('send.try_again')} onPress={handleTryAgain} />
         </View>
       </View>
     </ScreenContainer>

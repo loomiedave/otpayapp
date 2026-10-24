@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Linking } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import ScreenContainer from '../../../components/ui/ScreenContainer';
-import ScreenHeader from '../../../components/ui/ScreenHeader';
-import { useTheme } from '../../../contexts/ThemeContext';
-import { useThemeColors } from '../../../hooks/useThemeColors';
+import { View, Text, Pressable, Linking } from 'react-native';
+
+import { useTheme } from '@/contexts/ThemeContext';
+
+import { useThemeColors } from '@/hooks/useThemeColors';
+
+import ScreenHeader from '@/components/ui/ScreenHeader';
+import ScreenContainer from '@/components/ui/ScreenContainer';
 
 interface FAQItem {
   id: string;

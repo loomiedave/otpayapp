@@ -1,87 +1,226 @@
 {
+  "common": {
+    "error_title": "Something went wrong",
+    "error_try_again": "Please try again.",
+    "retry": "Try again"
+  },
+
+  "dxyChart": {
+    "collecting": "Collecting chart data...",
+    "error": "Unable to load DXY",
+    "loading": "Loading DXY...",
+    "title": "US Dollar Index",
+    "updated": "Updates every minute"
+  },
+
+  "dxyNews": {
+    "days_ago": "{{count}}d ago",
+    "empty": "No recent dollar news found.",
+    "error": "Unable to load the latest news.",
+    "hours_ago": "{{count}}h ago",
+    "just_now": "Just now",
+    "loading": "Loading latest news...",
+    "minutes_ago": "{{count}}m ago",
+    "retry": "Try again",
+    "source": "Financial News",
+    "subtitle": "Latest market-moving stories",
+    "title": "Dollar News"
+  },
+
   "home": {
-    "welcome-back": "Welcome back",
-    "quick_actions": "Quick actions",
-    "send_money": "Send money",
     "add": "Add",
+    "exchange_rates": "Exchange rates",
+    "live_rate": "LIVE RATE",
     "my_activity": "My activity",
+    "no_fee_transfer": "No fee on this transfer",
+    "quick_actions": "Quick actions",
     "recent_transactions": "Recent transactions",
     "see_all": "See all",
+    "send_money": "Send money",
     "today": "Today",
+    "transactions": "Transactions",
+    "view_other_rates": "View other rates",
+    "welcome_back": "Welcome back",
     "yesterday": "Yesterday"
   },
-  "send":{
-    "title": "Send money",
-     "recipient": "Recipient",
-      "addNew": "Add New",
-      "noRecipients": "No recipients yet — add one to send money.",
-      "amount": "AMOUNT",
-      "recipientGets": "Recipient gets",
-      "selectRecipient": "Select a recipient",
-      "fee": "Fee: {{fee}} {{currency}}",
-      "noFee": "No fee",
-      "corridorInactive": "{{from}} → {{to}} isn't live yet.",
-      "continue": "Continue"
-  },
-  "sendReview": {
-      "title": "Review Transfer",
-      "isReceiving": "is receiving",
-      "youSend": "You send",
-      "transferFee": "Transfer fee",
-      "exchangeRate": "Exchange rate",
-      "total": "Total",
-      "confirm": "Confirm & Send"
-    },
-  "rates": {
-    "live_rate": "Live rate",
-    "date_range_jan_dec": "January to December",
-    "no_fee_transfer": "No fee on this transfer",
-    "equals": "Equals",
-    "coming_soon": "Coming soon",
-    "view_other_rates": "View other rates"
-  },
-  "status": {
-    "pending": "Pending",
-    "approved": "Approved",
-    "rejected": "Rejected",
-    "fee": "Fee"
-  },
+
   "nav": {
     "home": "Home",
+    "markets": "Markets",
+    "more": "More",
     "recipients": "Recipients",
-    "transactions": "Transactions",
-    "more": "More"
+    "transactions": "Transactions"
   },
-  "verification": {
-    "verify_account_prompt": "Verify your OtiPay account by submitting your details",
-    "choose_documents": "Choose from our list of acceptable documents to submit",
-    "identity_verification": "Identity verification",
-    "identity_verified": "Identity verified"
-  },
+
   "profile": {
-    "personal_details": "Personal details",
-    "manage_personal_info": "Manage your personal information",
-    "personal_information": "Personal information",
-    "full_name": "Full name",
     "date_of_birth": "Date of birth",
-    "phone": "Phone",
     "email": "Email",
-    "update_details_contact_us": "To update your personal details, contact us via Live chat"
+    "full_name": "Full name",
+    "full_name_placeholder": "Your full legal name",
+    "kyc_submitted_message": "Your documents are under review. We will send you an email.",
+    "kyc_submitted_title": "Submitted",
+    "manage_personal_info": "Manage your personal information",
+    "personal_details": "Personal details",
+    "personal_information": "Personal information",
+    "phone": "Phone",
+    "phone_placeholder": "Your phone number",
+    "save_error_message": "Could not save. Please try again.",
+    "update_details_contact_us": "To update your personal details, contact us via Live chat",
+    "update_details_prefix": "To update your personal details, contact us via"
   },
+
+  "rates": {
+    "coming_soon": "Coming soon",
+    "date_range_jan_dec": "January to December",
+    "equals": "Equals",
+    "live_rate": "Live rate",
+    "no_fee_transfer": "No fee on this transfer",
+    "view_other_rates": "View other rates"
+  },
+
+  "recipients": {
+    "add_error": "Could not save recipient. Try again.",
+    "add_new": "Add New Recipient",
+    "add_title": "Add Recipient",
+    "cancel": "Cancel",
+    "coming_soon": "Coming soon",
+    "confirm_delete": "Remove {{name}}?",
+    "country": "COUNTRY",
+    "currency_info": "You'll be able to send in {{currency}} to this recipient.",
+    "delete": "Delete recipient",
+    "delete_action": "Delete",
+    "delete_error": "Could not delete recipient. Try again.",
+    "empty_description": "Add someone to start sending money across borders.",
+    "empty_title": "No recipients yet",
+    "error": "Error",
+    "full_name": "FULL NAME",
+    "load_error": "Could not load recipients.",
+    "name_placeholder": "Enter recipient's name here",
+    "phone": "PHONE",
+    "phone_placeholder": "Recipient's number",
+    "save": "Save Recipient",
+    "saving": "Saving…",
+    "title": "Recipients"
+  },
+
   "security": {
-    "title": "Security",
-    "subtitle": "Pin, biometrics, devices"
+    "subtitle": "Pin, biometrics, devices",
+    "title": "Security"
   },
+
+  "send": {
+    "addNew": "Add New",
+    "amount": "AMOUNT",
+    "approve_payment": "Check your phone to approve the payment",
+    "checkout_title": "Complete Payment",
+    "confirmed": "Payment received. Sending to recipient…",
+    "continue": "Continue",
+    "corridorInactive": "{{from}} → {{to}} isn't live yet.",
+    "could_not_complete": "We couldn't complete this transfer.",
+    "could_not_complete_to": "We couldn't complete the transfer to",
+    "done": "Done",
+    "failed": "Transfer failed",
+    "fee": "Fee: {{fee}} {{currency}}",
+    "network": "Network",
+    "networkNotSupported": "This phone number is not supported.",
+    "no_charge": "Nothing was charged beyond what the payment network attempted.",
+    "noFee": "No fee",
+    "noRecipients": "No recipients yet — add one to send money.",
+    "phonePlaceholder": "Recipient's phone number",
+    "processing": "Processing...",
+    "recipient": "Recipient",
+    "recipientGets": "Recipient gets",
+    "recipientName": "Recipient name",
+    "recipientNamePlaceholder": "Full name",
+    "recipientPhone": "Recipient phone",
+    "selectRecipient": "Select a recipient",
+    "title": "Send money",
+    "transferSubmitted": "Transfer submitted",
+    "try_again": "Try again",
+    "verifyingPayment": "We're verifying your payment. Once confirmed,",
+    "willBeSentTo": "will be sent to"
+  },
+
+  "sendReview": {
+    "confirm": "Confirm & Send",
+    "exchangeRate": "Exchange rate",
+    "isReceiving": "is receiving",
+    "payerPhoneHint": "You'll get a prompt on this number to approve the payment.",
+    "payerPhoneLabel": "NUMBER TO CHARGE (MTN MOMO)",
+    "payerPhonePlaceholder": "e.g. 0242439784",
+    "redirectNotice": "You'll be taken to a secure page to complete payment with Flooz or T-Money.",
+    "startError": "Could not start transfer. Try again.",
+    "title": "Review Transfer",
+    "total": "Total",
+    "transferFee": "Transfer fee",
+    "youSend": "You send"
+  },
+
+  "settings": {
+    "sign_out": "Sign out",
+    "subtitle": "Appearance, notifications, security",
+    "title": "Settings"
+  },
+
+  "status": {
+    "approved": "Approved",
+    "completed": "Completed",
+    "confirmed": "Confirmed",
+    "failed": "Failed",
+    "fee": "Fee",
+    "pending": "Pending",
+    "rejected": "Rejected"
+  },
+
   "support": {
-    "live_chat": "Live chat",
-    "talk_to_support": "Talk to our support team",
+    "empty_chat": "Send a message and our team will reply here.",
     "help_and_contact": "Help and contact",
     "help_subtitle": "Read FAQs, email and call us",
-    "type_a_message": "Type a message"
+    "live_chat": "Live chat",
+    "talk_to_support": "Talk to our support team",
+    "type_a_message": "Type a message..."
   },
-  "settings": {
-    "title": "Settings",
-    "subtitle": "Appearance, notifications, security",
-    "sign_out": "Sign out"
+
+  "transactionDetail": {
+    "amountSent": "Amount sent",
+    "collectionReference": "Collection reference",
+    "corridor": "Corridor",
+    "couldNotSaveTitle": "Could not save receipt",
+    "couldNotShareTitle": "Could not share receipt",
+    "dateAt": "{{date}} at {{time}}",
+    "download": "Download",
+    "exchangeRate": "Exchange rate",
+    "fee": "Fee",
+    "goBack": "Go back",
+    "moneyTransfer": "Money Transfer",
+    "network": "Network",
+    "notFound": "Transaction not found.",
+    "payoutReference": "Payout reference",
+    "permissionMessage": "Allow photo access to save your receipt.",
+    "permissionTitle": "Permission needed",
+    "recipient": "Recipient",
+    "recipientNumber": "Recipient number",
+    "recipientReceives": "Recipient receives",
+    "refLine": "Ref: {{reference}}  |  {{stamp}}",
+    "retryMessage": "Please try again.",
+    "savedMessage": "Receipt saved to your photos.",
+    "savedTitle": "Saved",
+    "share": "Share",
+    "shareDialogTitle": "Share receipt",
+    "sharingUnavailableMessage": "Sharing is not supported on this device.",
+    "sharingUnavailableTitle": "Sharing not available",
+    "status": "Status",
+    "statusConfirmed": "Sending",
+    "statusFailed": "Failed",
+    "statusPaidOut": "Completed",
+    "statusPendingVerification": "Pending verification",
+    "totalAmount": "Total Amount"
+  },
+
+  "verification": {
+    "choose_documents": "Choose from our list of acceptable documents to submit",
+    "identity_verification": "Identity verification",
+    "identity_verified": "Identity verified",
+    "verify_account_prompt": "Verify your OtiPay account by submitting your details"
   }
 }

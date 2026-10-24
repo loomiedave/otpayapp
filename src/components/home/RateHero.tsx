@@ -1,9 +1,14 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { COUNTRIES, CountryCode } from '../../constants/countries';
-import { formatUpdatedAt } from '../../lib/currency';
-import { useTheme } from '../../contexts/ThemeContext';
+import { View, Text, Pressable } from 'react-native';
+
+import { formatUpdatedAt } from '@/lib/currency';
+
+import { useTheme } from '@/contexts/ThemeContext';
+
+import { COUNTRIES, CountryCode } from '@/constants/countries';
+
+import { useTranslation } from 'react-i18next';
 
 interface RateHeroProps {
   from: CountryCode;
@@ -23,6 +28,7 @@ function formatRateSmart(rate: number): string {
 
 export default function RateHero({ from, to, rate, fee, updatedAt, onSwap }: RateHeroProps): React.JSX.Element {
   const { isDark } = useTheme();
+  const { t } = useTranslation()
 
   return (
     <View
@@ -50,7 +56,7 @@ export default function RateHero({ from, to, rate, fee, updatedAt, onSwap }: Rat
             }
             style={{ letterSpacing: 1.2 }}
           >
-            LIVE RATE
+            {t('home.live_rate')}
           </Text>
         </View>
         <Text className={isDark ? 'text-text-muted-dark text-xs' : 'text-text-muted text-xs'}>
@@ -108,11 +114,11 @@ export default function RateHero({ from, to, rate, fee, updatedAt, onSwap }: Rat
       </Text>
 
       <Text className={isDark ? 'text-text-muted-dark text-sm text-center mt-3' : 'text-text-muted text-sm text-center mt-3'}>
-        1000 {COUNTRIES[from].currency} equals {COUNTRIES[to].currency}
+        1000 {COUNTRIES[from].currency} = {COUNTRIES[to].currency}
       </Text>
 
       <Text className={isDark ? 'text-text-muted-dark text-xs text-center mt-1.5' : 'text-text-muted text-xs text-center mt-1.5'}>
-        {fee > 0 ? `Includes a ${fee} ${COUNTRIES[from].currency} fee` : 'No fee on this transfer'}
+        {fee > 0 ? `${t('status.fee')} : ${fee} ${COUNTRIES[from].currency}` : `${t('home.no_fee_transfer')}`}
       </Text>
     </View>
   );

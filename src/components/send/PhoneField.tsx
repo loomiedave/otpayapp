@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import CountryFlag from 'react-native-country-flag';
 import Input from '../ui/Input';
+import { useTranslation } from 'react-i18next';
 
 interface PhoneFieldProps {
   phone: string;

@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { View, Text, Pressable } from 'react-native';
+
+import { useTranslation } from 'react-i18next';
 
 interface ActionItemProps {
   icon: keyof typeof Feather.glyphMap;
@@ -13,6 +15,8 @@ interface ActionItemProps {
 
 function ActionItem({ icon, label, onPress, primary }: ActionItemProps): React.JSX.Element {
   const { isDark } = useTheme();
+  const { t } = useTranslation();
+
 
   return (
     <Pressable onPress={onPress} className="items-center active:opacity-70" style={{ width: 72 }}>
@@ -43,23 +47,24 @@ function ActionItem({ icon, label, onPress, primary }: ActionItemProps): React.J
 
 export default function QuickActionsRow(): React.JSX.Element {
   const router = useRouter();
+  const { t } = useTranslation();
 
   return (
     <View className="flex-row justify-between px-6">
       <ActionItem
         icon="send"
-        label="Send"
+        label={t('home.send_money')}
         primary
         onPress={() => router.push('/home/send' as never)}
       />
       <ActionItem
         icon="users"
-        label="Add"
+        label={t('home.add')}
         onPress={() => router.push('/(tabs)/recipients/add-recipient' as never)}
       />
       <ActionItem
         icon="clock"
-        label="Transactions"
+        label={t('home.transactions')}
         onPress={() => router.push('/(tabs)/transactions' as never)}
       />
     </View>

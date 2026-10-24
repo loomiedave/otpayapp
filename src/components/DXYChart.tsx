@@ -14,6 +14,8 @@ import Svg, {
   Polygon,
 } from "react-native-svg";
 
+import { useTranslation } from "react-i18next";
+
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const API_URL = "https://oicrtvfceigbwpvufhih.supabase.co/functions/v1/dxy";
@@ -28,6 +30,7 @@ export default function DXYChart() {
   const [data, setData] = useState<DXYData | null>(null);
   const [history, setHistory] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   const fetchDXY = async () => {
     try {
@@ -80,7 +83,7 @@ export default function DXYChart() {
       <View className="h-[250px] items-center justify-center">
         <ActivityIndicator size="small" color="#2563eb" />
         <Text className="mt-2 text-sm text-text-muted dark:text-text-muted-dark">
-          Loading DXY...
+          {t('dxyChart.loading')}
         </Text>
       </View>
     );
@@ -89,7 +92,7 @@ export default function DXYChart() {
   if (!data) {
     return (
       <View className="p-5">
-        <Text className="text-red-500">Unable to load DXY</Text>
+        <Text className="text-red-500">{t('dxyChart.error')}</Text>
       </View>
     );
   }
@@ -104,11 +107,11 @@ export default function DXYChart() {
       <View className="mb-4 flex-row items-center justify-between">
         <View>
           <Text className="text-lg font-semibold text-text-main dark:text-text-main-dark">
-            US Dollar Index
+          {t('dxyChart.title')}
           </Text>
 
           <Text className="mt-1 text-xs text-text-muted dark:text-text-muted-dark">
-            US Dollar Index
+          {t('dxyChart.title')}
           </Text>
         </View>
 
@@ -135,7 +138,7 @@ export default function DXYChart() {
       {/* Updated */}
 
       <Text className="mt-1.5 text-[11px] text-text-muted dark:text-text-muted-dark">
-        Updates every minute
+      {t('dxyChart.updated')}
       </Text>
     </View>
   );
@@ -144,6 +147,7 @@ export default function DXYChart() {
 function DXYLineChart({ values }: { values: number[] }) {
   const chartWidth = SCREEN_WIDTH - 32;
   const chartHeight = 220;
+  const { t } = useTranslation()
 
   if (values.length < 2) {
     return (
@@ -152,7 +156,7 @@ function DXYLineChart({ values }: { values: number[] }) {
         style={{ width: chartWidth, height: chartHeight }}
       >
         <Text className="text-text-muted dark:text-text-muted-dark">
-          Collecting chart data...
+        {t('dxyChart.collecting')}
         </Text>
       </View>
     );

@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Alert } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import { Feather } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { View, Text, Pressable, Alert } from 'react-native';
+
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import ImageSlot from './ImageSlot';
-import DocumentTypeModal, { DocumentType, DOCUMENT_LABELS, requiresBack } from './DocumentTypeModal';
-import CountryPickerModal from './CountryPickerModal';
-import { COUNTRIES, CountryCode } from '@/constants/countries';
+
 import { useTheme } from '@/contexts/ThemeContext';
+
+import { COUNTRIES, CountryCode } from '@/constants/countries';
+
+import ImageSlot from './ImageSlot';
+import CountryPickerModal from './CountryPickerModal';
+import DocumentTypeModal, { DocumentType, DOCUMENT_LABELS, requiresBack } from './DocumentTypeModal';
 
 interface KycStep2DocumentsProps {
   documentType: DocumentType | null;

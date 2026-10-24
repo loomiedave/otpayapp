@@ -1,29 +1,32 @@
+import { Image } from 'expo-image';
 import React, { useState } from 'react';
-import { View, Text, Pressable, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
-import ScreenContainer from '../../components/ui/ScreenContainer';
-import Input from '../../components/ui/Input';
-import Button from '../../components/ui/Button';
-import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../contexts/AuthContext';
-import { Image } from 'expo-image';
+import { View, Text, Pressable, Modal } from 'react-native';
+
+import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
+
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import ScreenContainer from '@/components/ui/ScreenContainer';
 
 export default function SignUpScreen(): React.JSX.Element {
   const router = useRouter();
-  const { isDark } = useTheme();
   const { signUp } = useAuth();
-  const [firstName, setFirstName] = useState<string>('');
-  const [lastName, setLastName] = useState<string>('');
+  const { isDark } = useTheme();
+  
   const [phone, setPhone] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [awaitingConfirmation, setAwaitingConfirmation] = useState<boolean>(false);
+  const [lastName, setLastName] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [firstName, setFirstName] = useState<string>('');
   const [serverError, setServerError] = useState<string>('');
+  const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState<boolean>(false);
 
   const handleSignUp = async (): Promise<void> => {
     if (!firstName || !lastName || !phone || !email || !password || !confirmPassword) {

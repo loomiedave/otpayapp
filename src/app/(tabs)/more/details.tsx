@@ -1,23 +1,28 @@
-import React, { useState, useCallback } from 'react';
+import { decode } from 'base64-arraybuffer';
 import { View, Text, Alert } from 'react-native';
-import { useFocusEffect } from 'expo-router';
-import ScreenContainer from '@/components/ui/ScreenContainer';
-import ScreenHeader from '@/components/ui/ScreenHeader';
-import ProfileField from '@/components/profile/ProfileField';
-import DateOfBirthField from '@/components/profile/DateOfBirthField';
-import KycStepIndicator from '@/components/kyc/KycStepIndicator';
-import KycStep1Instructions from '@/components/kyc/KycStep1Instructions';
-import KycStep2Documents from '@/components/kyc/KycStep2Documents';
-import KycStep3Selfie from '@/components/kyc/KycStep3Selfie';
-import KycStatusBanner from '@/components/kyc/KycStatusBanner';
-import { DocumentType, requiresBack } from '@/components/kyc/DocumentTypeModal';
-import { CountryCode } from '@/constants/countries';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useState, useCallback } from 'react';
+import * as FileSystem from 'expo-file-system/legacy';
+
+import { supabase } from '@/lib/supabase';
+
+import { useTranslation } from 'react-i18next';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { supabase } from '@/lib/supabase';
-import * as FileSystem from 'expo-file-system/legacy';
-import { decode } from 'base64-arraybuffer';
-import { Link } from 'expo-router';
+
+import { CountryCode } from '@/constants/countries';
+
+import ScreenHeader from '@/components/ui/ScreenHeader';
+import ProfileField from '@/components/profile/ProfileField';
+import KycStep3Selfie from '@/components/kyc/KycStep3Selfie';
+import ScreenContainer from '@/components/ui/ScreenContainer';
+import KycStatusBanner from '@/components/kyc/KycStatusBanner';
+import KycStepIndicator from '@/components/kyc/KycStepIndicator';
+import KycStep2Documents from '@/components/kyc/KycStep2Documents';
+import DateOfBirthField from '@/components/profile/DateOfBirthField';
+import KycStep1Instructions from '@/components/kyc/KycStep1Instructions';
+import { DocumentType, requiresBack } from '@/components/kyc/DocumentTypeModal';
 
 interface Profile {
   full_name: string | null;
@@ -34,20 +39,21 @@ interface KycSubmission {
 export default function DetailsScreen(): React.JSX.Element {
   const { session } = useAuth();
   const { isDark } = useTheme();
+  const { t } = useTranslation();
+
   const userId = session?.user?.id;
-
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [kyc, setKyc] = useState<KycSubmission | null>(null);
+  
   const [loading, setLoading] = useState(true);
-
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [submitting, setSubmitting] = useState(false);
+  const [documentNumber, setDocumentNumber] = useState('');
+  const [kyc, setKyc] = useState<KycSubmission | null>(null);
+  const [backUri, setBackUri] = useState<string | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [frontUri, setFrontUri] = useState<string | null>(null);
+  const [selfieUri, setSelfieUri] = useState<string | null>(null);
   const [documentType, setDocumentType] = useState<DocumentType | null>(null);
   const [issuingCountry, setIssuingCountry] = useState<CountryCode | null>(null);
-  const [documentNumber, setDocumentNumber] = useState('');
-  const [frontUri, setFrontUri] = useState<string | null>(null);
-  const [backUri, setBackUri] = useState<string | null>(null);
-  const [selfieUri, setSelfieUri] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
 
   const cardClass = isDark
     ? 'rounded-2xl bg-background-card-dark border border-border-main-dark px-4'
@@ -72,7 +78,7 @@ export default function DetailsScreen(): React.JSX.Element {
     if (!userId) return;
     const { error } = await supabase.from('profiles').update({ [field]: value }).eq('id', userId);
     if (error) {
-      Alert.alert('Something went wrong', 'Could not save. Please try again.');
+      Alert.alert(t('common.error_title'), t('profile.save_error_message'));
       return;
     }
     setProfile((prev) => (prev ? { ...prev, [field]: value } : prev));
@@ -116,40 +122,43 @@ export default function DetailsScreen(): React.JSX.Element {
       if (error) throw error;
 
       setKyc({ status: 'pending', rejection_reason: null });
-      Alert.alert('Submitted', 'Your documents are under review, we will send you an email.');
+      Alert.alert(t('profile.kyc_submitted_title'), t('profile.kyc_submitted_message'));
     } catch (err) {
-      Alert.alert('Something went wrong', 'Please try again.');
+      Alert.alert(t('common.error_title'), t('common.error_try_again'));
     } finally {
       setSubmitting(false);
     }
   };
 
   if (loading || !profile) {
-    return <ScreenContainer><ScreenHeader title="Personal Details" /></ScreenContainer>;
-  }
+    return <ScreenContainer><ScreenHeader title={t('profile.personal_details')} /></ScreenContainer>; }
 
   const showWizard = !kyc || kyc.status === 'rejected';
 
   return (
     <ScreenContainer scroll keyboardAvoiding>
-      <ScreenHeader title="Personal Details" />
+      <ScreenHeader title={t('profile.personal_details')} />
 
-      <Text className={sectionLabel}>PERSONAL INFORMATION</Text>
+      <Text className={sectionLabel}>{t('profile.personal_information').toUpperCase()}</Text>
       <View className={cardClass}>
-        <ProfileField label="Full Name" value={profile.full_name} locked={!!profile.full_name} placeholder="Your full legal name" onSave={(v) => saveProfileField('full_name', v)} />
+        <ProfileField label={t('profile.full_name')} value={profile.full_name} locked={!!profile.full_name} placeholder={t('profile.full_name_placeholder')} onSave={(v) => saveProfileField('full_name', v)} />
         <DateOfBirthField value={profile.date_of_birth} locked={!!profile.date_of_birth} onSave={(v) => saveProfileField('date_of_birth', v)} />
-        <ProfileField label="Phone" value={profile.phone} locked={!!profile.phone} keyboardType="phone-pad" placeholder="Your phone number" onSave={(v) => saveProfileField('phone', v)} />
-        <ProfileField label="Email" value={profile.email} locked bordered={false} onSave={() => {}} />
+        <ProfileField label={t('profile.phone')} value={profile.phone} locked={!!profile.phone} keyboardType="phone-pad" placeholder={t('profile.phone_placeholder')} onSave={(v) => saveProfileField('phone', v)} />
+        <ProfileField label={t('profile.email')} value={profile.email} locked bordered={false} onSave={() => {}} />
       </View>
 
       <Text className={footnote}>
-        To update your personal details,{' '}
-        <Link href="/profile/live-chat">
-          contact us via <Text className="text-blue-500 underline">Live chat.</Text>
-        </Link>
+        {t('profile.update_details_prefix')}{' '}
+        <Text
+          className="text-blue-500 underline"
+          onPress={() => router.push('/more/live-chat')}
+          accessibilityRole="link"
+        >
+          {t('support.live_chat')}.
+        </Text>
       </Text>
 
-      <Text className={`${sectionLabel} mt-6`}>IDENTITY VERIFICATION</Text>
+      <Text className={`${sectionLabel} mt-6`}>{t('verification.identity_verification').toUpperCase()}</Text>
 
       {kyc ? <KycStatusBanner status={kyc.status} rejectionReason={kyc.rejection_reason} /> : null}
 

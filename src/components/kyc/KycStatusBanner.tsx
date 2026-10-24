@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+
 import { useTheme } from '@/contexts/ThemeContext';
 
 type KycStatus = 'pending' | 'approved' | 'rejected';
@@ -19,6 +20,7 @@ const CONFIG: Record<KycStatus, { icon: keyof typeof Feather.glyphMap; color: st
 export default function KycStatusBanner({ status, rejectionReason }: KycStatusBannerProps): React.JSX.Element {
   const { isDark } = useTheme();
   const { icon, color, title } = CONFIG[status];
+
   const cardClass = isDark
     ? 'rounded-2xl bg-background-card-dark border border-border-main-dark p-4'
     : 'rounded-2xl bg-background-card border border-border-main p-4';

@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+
 import Button from '@/components/ui/Button';
+
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface KycStep1InstructionsProps {
@@ -11,6 +13,7 @@ interface KycStep1InstructionsProps {
 
 export default function KycStep1Instructions({ fullName, onContinue }: KycStep1InstructionsProps): React.JSX.Element {
   const { isDark } = useTheme();
+  
   const cardClass = isDark
     ? 'rounded-2xl bg-background-card-dark border border-border-main-dark p-5'
     : 'rounded-2xl bg-background-card border border-border-main p-5';

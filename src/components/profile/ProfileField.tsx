@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { View, Text, Pressable } from 'react-native';
+
 import Input from '@/components/ui/Input';
+
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface ProfileFieldProps {
@@ -24,9 +26,10 @@ export default function ProfileField({
   onSave,
 }: ProfileFieldProps): React.JSX.Element {
   const { isDark } = useTheme();
+  
+  const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value ?? '');
-  const [saving, setSaving] = useState(false);
 
   const borderClass = bordered ? (isDark ? 'border-b border-border-main-dark' : 'border-b border-border-main') : '';
   const mutedText = isDark ? 'text-text-muted-dark text-sm' : 'text-text-muted text-sm';

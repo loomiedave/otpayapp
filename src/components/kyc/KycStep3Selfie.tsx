@@ -1,11 +1,15 @@
 import React from 'react';
-import { View, Text, Pressable, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { View, Text, Pressable, Alert } from 'react-native';
+
 import Button from '@/components/ui/Button';
+
+import { useTheme } from '@/contexts/ThemeContext';
+
+import { COUNTRIES, CountryCode } from '@/constants/countries';
+
 import ImageSlot from './ImageSlot';
 import { DocumentType, DOCUMENT_LABELS } from './DocumentTypeModal';
-import { COUNTRIES, CountryCode } from '@/constants/countries';
-import { useTheme } from '@/contexts/ThemeContext';
 
 interface KycStep3SelfieProps {
   documentType: DocumentType;

@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Switch } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import ScreenContainer from '@/components/ui/ScreenContainer';
-import ScreenHeader from '@/components/ui/ScreenHeader';
+import { View, Text, Pressable, Switch } from 'react-native';
+
 import { useTheme } from '@/contexts/ThemeContext';
+
 import { useThemeColors } from '@/hooks/useThemeColors';
+
+import ScreenHeader from '@/components/ui/ScreenHeader';
+import ScreenContainer from '@/components/ui/ScreenContainer';
 
 interface MockDevice {
   id: string;
   name: string;
   lastActive: string;
 }
-
-// Hardcoded for now — will come from a sessions table once Supabase is wired up.
 const MOCK_DEVICES: MockDevice[] = [
   { id: '1', name: 'iPhone 15 Pro', lastActive: 'Active now' },
   { id: '2', name: 'Chrome on MacBook', lastActive: 'Last active 2 days ago' },
@@ -21,8 +22,9 @@ const MOCK_DEVICES: MockDevice[] = [
 export default function SecurityScreen(): React.JSX.Element {
   const { isDark } = useTheme();
   const colors = useThemeColors();
-  const [biometricEnabled, setBiometricEnabled] = useState<boolean>(true);
+
   const [pinEnabled, setPinEnabled] = useState<boolean>(false);
+  const [biometricEnabled, setBiometricEnabled] = useState<boolean>(true);
 
   const cardClass = isDark
     ? 'rounded-2xl bg-background-card-dark border border-border-main-dark'

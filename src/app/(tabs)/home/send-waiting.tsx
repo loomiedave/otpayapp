@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Feather } from '@expo/vector-icons';
-import ScreenContainer from '../../../components/ui/ScreenContainer';
-import { useTheme } from '../../../contexts/ThemeContext';
+import { View, Text, ActivityIndicator } from 'react-native';
+
 import { supabase } from '@/lib/supabase';
+
+import { useTranslation } from 'react-i18next';
+
+import { useTheme } from '@/contexts/ThemeContext';
+
+import ScreenContainer from '@/components/ui/ScreenContainer';
 
 export default function SendWaitingScreen(): React.JSX.Element {
   const { isDark } = useTheme();
-  const { transferId } = useLocalSearchParams<{ transferId: string }>();
+  const { t } = useTranslation();
   const [status, setStatus] = useState('collecting');
+  const { transferId } = useLocalSearchParams<{ transferId: string }>();
 
   useEffect(() => {
     if (!transferId) return;
@@ -30,8 +35,8 @@ export default function SendWaitingScreen(): React.JSX.Element {
   }, [transferId]);
 
   const messages: Record<string, string> = {
-    collecting: 'Check your phone to approve the payment',
-    confirmed: 'Payment received — sending to recipient…',
+    collecting: `${t('send.approve_payment')}`,
+    confirmed: `${t('send.confirmed')}`,
   };
 
   return (
@@ -39,7 +44,7 @@ export default function SendWaitingScreen(): React.JSX.Element {
       <View className="flex-1 items-center justify-center px-8">
         <ActivityIndicator size="large" />
         <Text className={isDark ? 'text-text-main-dark text-center mt-6 text-base' : 'text-text-main text-center mt-6 text-base'}>
-          {messages[status] ?? 'Processing…'}
+          {messages[status] ?? `${t('send.processing')}`}
         </Text>
       </View>
     </ScreenContainer>

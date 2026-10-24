@@ -7,6 +7,14 @@ export function formatRate(rate: number): string {
   return rate.toFixed(1);
 }
 
+export function formatAmount(value: number, currencyCode: string): string {
+  const decimals = currencyCode === 'XOF' ? 0 : 2;
+  return value.toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
 export function formatUpdatedAt(isoDate: string): string {
   const date = new Date(isoDate);
   return date.toLocaleString(undefined, {

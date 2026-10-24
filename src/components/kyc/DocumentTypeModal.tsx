@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, Modal } from 'react-native';
+
 import { useTheme } from '@/contexts/ThemeContext';
 
 export type DocumentType = 'passport' | 'national_id' | 'drivers_license' | 'voters_card';
@@ -22,6 +23,7 @@ interface DocumentTypeModalProps {
 
 export default function DocumentTypeModal({ visible, onSelect, onClose }: DocumentTypeModalProps): React.JSX.Element {
   const { isDark } = useTheme();
+  
   const cardClass = isDark
     ? 'rounded-2xl bg-background-card-dark border border-border-main-dark'
     : 'rounded-2xl bg-background-card border border-border-main';

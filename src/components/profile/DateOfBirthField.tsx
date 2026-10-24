@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Platform } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { View, Text, Pressable, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface DateOfBirthFieldProps {
@@ -16,8 +17,9 @@ const formatDisplay = (iso: string) =>
 
 export default function DateOfBirthField({ value, locked, bordered = true, onSave }: DateOfBirthFieldProps): React.JSX.Element {
   const { isDark } = useTheme();
-  const [pickerOpen, setPickerOpen] = useState(false);
+  
   const [pending, setPending] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const borderClass = bordered ? (isDark ? 'border-b border-border-main-dark' : 'border-b border-border-main') : '';
   const mutedText = isDark ? 'text-text-muted-dark text-sm' : 'text-text-muted text-sm';

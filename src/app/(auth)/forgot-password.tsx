@@ -1,19 +1,22 @@
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
-import { router } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
-import ScreenContainer from '../../components/ui/ScreenContainer';
+
+import { supabase } from '@/lib/supabase';
+
+import { useTheme } from '@/contexts/ThemeContext';
+
 import Input from '@/components/ui/Input';
-import Button from '../../components/ui/Button';
-import { useTheme } from '../../contexts/ThemeContext';
-import { supabase } from '../../lib/supabase';
+import Button from '@/components/ui/Button';
+import ScreenContainer from '@/components/ui/ScreenContainer';
 
 export default function ForgotPasswordScreen(): React.JSX.Element {
   const { isDark } = useTheme();
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [sent, setSent] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleReset = async (): Promise<void> => {
     if (!email) {

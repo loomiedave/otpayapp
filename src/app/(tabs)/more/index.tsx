@@ -1,14 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ScreenContainer from '../../../components/ui/ScreenContainer';
-import { useThemeColors } from '../../../hooks/useThemeColors';
-import { useTheme } from '../../../contexts/ThemeContext';
-import { useAuth } from '../../../contexts/AuthContext';
+
+import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
+
 import { supabase } from '@/lib/supabase';
 import { resetLaunched } from '@/lib/onboardingStore';
+
+import { useThemeColors } from '@/hooks/useThemeColors';
+
+import { useTranslation } from 'react-i18next';
+
+
+import ScreenContainer from '@/components/ui/ScreenContainer';
 
 interface MenuItem {
   id: string;
@@ -19,17 +26,18 @@ interface MenuItem {
 }
 
 const MENU_ITEMS: MenuItem[] = [
-  { id: 'details', icon: 'user', title: 'Personal Details', subtitle: 'Manage your personal information', route: '/profile/details' },
-  { id: 'security', icon: 'shield', title: 'Security', subtitle: 'PIN, biometrics, devices', route: '/profile/security' },
-  { id: 'live', icon: 'message-circle', title: 'Live Chat', subtitle: 'Talk to our support team', route: '/profile/live-chat' },
-  { id: 'support', icon: 'help-circle', title: 'Help & Contact', subtitle: 'read FAQs, email and call us', route: '/profile/support' },
-  { id: 'settings', icon: 'settings', title: 'Settings', subtitle: 'Appearance, notifications, security', route: '/profile/settings' },
+  { id: 'details', icon: 'user', title: 'profile.personal_details', subtitle: 'profile.manage_personal_info', route: '/more/details' },
+  { id: 'security', icon: 'shield', title: 'security.title', subtitle: 'security.subtitle', route: '/more/security' },
+  { id: 'live', icon: 'message-circle', title: 'support.live_chat', subtitle: 'support.talk_to_support', route: '/more/live-chat' },
+  { id: 'support', icon: 'help-circle', title: 'support.help_and_contact', subtitle: 'support.help_subtitle', route: '/more/support' },
+  { id: 'settings', icon: 'settings', title: 'settings.title', subtitle: 'settings.subtitle', route: '/more/settings' },
 ];
 
-export default function ProfileScreen(): React.JSX.Element {
-  const colors = useThemeColors();
+export default function MoreScreen(): React.JSX.Element {
   const { isDark } = useTheme();
+  const colors = useThemeColors();
   const { session, signOut } = useAuth();
+  const { t } = useTranslation();
 
   const userEmail = session?.user?.email ?? '';
   const [verified, setVerified] = useState(false);
@@ -100,10 +108,10 @@ export default function ProfileScreen(): React.JSX.Element {
             </View>
             <View className="flex-1">
               <Text className={isDark ? 'text-text-main-dark font-semibold text-sm' : 'text-text-main font-semibold text-sm'}>
-                {item.title}
+                {t(item.title)}
               </Text>
               <Text className={isDark ? 'text-text-muted-dark text-xs mt-0.5' : 'text-text-muted text-xs mt-0.5'}>
-                {item.subtitle}
+                {t(item.subtitle)}
               </Text>
             </View>
            {/*  <Feather name="chevron-right" size={16} color={colors.iconMuted} /> */}
@@ -121,7 +129,7 @@ export default function ProfileScreen(): React.JSX.Element {
             <Feather name="log-out" size={16} color={colors.danger} />
           </View>
           <Text className="font-semibold text-sm" style={{ color: colors.danger }}>
-            Sign Out
+            {t('settings.sign_out')}
           </Text>
         </Pressable>
 

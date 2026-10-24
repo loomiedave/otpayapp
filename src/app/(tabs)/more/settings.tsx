@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, Pressable, ScrollView } from 'react-native';
 import { router } from 'expo-router';
-import { useTheme } from '../../../contexts/ThemeContext';
+import { View, Text, Pressable, ScrollView } from 'react-native';
+
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function SettingsScreen(): React.JSX.Element {
   const { isDark, mode, setMode } = useTheme();
+  
   return (
     <ScrollView className={isDark ? 'flex-1 bg-background-main-dark' : 'flex-1 bg-background-main'}>
       <View className="pt-16 px-6">

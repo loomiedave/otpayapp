@@ -1,23 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { View, Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import ScreenContainer from '../../../components/ui/ScreenContainer';
-import Button from '../../../components/ui/Button';
-import { useTheme } from '../../../contexts/ThemeContext';
+import React, { useEffect, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+
 import { supabase } from '@/lib/supabase';
-import { useCountries } from '@/hooks/useCountries';
 import { formatRate } from '@/lib/currency';
+
+import { useTranslation } from 'react-i18next';
+
+import { useTheme } from '@/contexts/ThemeContext';
+
+import { useCountries } from '@/hooks/useCountries';
+
+import Button from '@/components/ui/Button';
+import Loading from '@/components/ui/Loading';
+import ScreenContainer from '@/components/ui/ScreenContainer';
 
 export default function SendSuccessScreen(): React.JSX.Element {
   const { isDark } = useTheme();
+  const { t } = useTranslation();
   const { getCountry } = useCountries();
-  const { transferId } = useLocalSearchParams<{ transferId: string }>();
+  const [loading, setLoading] = useState(true);
+  const [toCountryCode, setToCountryCode] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [amountReceived, setAmountReceived] = useState(0);
-  const [toCountryCode, setToCountryCode] = useState('');
-  const [loading, setLoading] = useState(true);
-
+  const { transferId } = useLocalSearchParams<{ transferId: string }>();
+  
   useEffect(() => {
     if (!transferId) return;
     supabase
@@ -41,11 +49,7 @@ export default function SendSuccessScreen(): React.JSX.Element {
 
   if (loading) {
     return (
-      <ScreenContainer>
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator />
-        </View>
-      </ScreenContainer>
+     <Loading />
     );
   }
 
@@ -62,16 +66,16 @@ export default function SendSuccessScreen(): React.JSX.Element {
         </View>
 
         <Text className={isDark ? 'text-2xl font-bold text-text-main-dark text-center mb-2' : 'text-2xl font-bold text-text-main text-center mb-2'}>
-          Transfer Submitted
+          {t('send.transferSubmitted')}
         </Text>
         <Text className={isDark ? 'text-text-muted-dark text-base text-center leading-5 mb-8' : 'text-text-muted text-base text-center leading-5 mb-8'}>
-          We're verifying your payment. Once confirmed,{'\n'}
-          {formatRate(amountReceived)} {toCountry.currency_code} will be sent to{'\n'}
+          {t('send.verifyingPayment')}{'\n'}
+          {formatRate(amountReceived)} {toCountry.currency_code} {t('send.willBeSentTo')}{'\n'}
           <Text className={isDark ? 'text-text-main-dark font-semibold' : 'text-text-main font-semibold'}>{recipientName}</Text>
         </Text>
 
         <View className="w-full">
-          <Button label="Done" onPress={handleDone} />
+          <Button label={t('send.done')} onPress={handleDone} />
         </View>
       </View>
     </ScreenContainer>

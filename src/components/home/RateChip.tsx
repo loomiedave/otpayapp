@@ -1,9 +1,12 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { CURRENCIES, CurrencyCode } from '../../constants/currencies';
-import { formatRate } from '../../lib/currency';
-import { useTheme } from '../../contexts/ThemeContext';
+
+import { formatRate } from '@/lib/currency';
+
+import { useTheme } from '@/contexts/ThemeContext';
+
+import { CURRENCIES, CurrencyCode } from '@/constants/currencies';
 
 interface RateChipProps {
   from: CurrencyCode;
@@ -13,8 +16,9 @@ interface RateChipProps {
 
 export default function RateChip({ from, to, rate }: RateChipProps): React.JSX.Element {
   const { isDark } = useTheme();
-  const fromInfo = CURRENCIES[from];
+  
   const toInfo = CURRENCIES[to];
+  const fromInfo = CURRENCIES[from];
 
   return (
     <View

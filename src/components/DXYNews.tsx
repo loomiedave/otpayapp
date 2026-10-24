@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   View,
   Text,
@@ -25,6 +26,7 @@ export default function DXYNews() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const { t } = useTranslation();
 
   const fetchNews = async () => {
     try {
@@ -70,26 +72,26 @@ export default function DXYNews() {
       (now.getTime() - published.getTime()) / 60000
     );
 
-    if (minutes < 1) return "Just now";
+    if (minutes < 1) return `${t('dxyNews.just_now')}`;
 
     if (minutes < 60) {
-      return `${minutes}m ago`;
+      return t("dxyNews.minutes_ago", { count: minutes });
     }
 
     const hours = Math.floor(minutes / 60);
 
     if (hours < 24) {
-      return `${hours}h ago`;
+      return t("dxyNews.hours_ago", { count: hours });
     }
 
-    return `${Math.floor(hours / 24)}d ago`;
+    return t("dxyNews.days_ago", { count: Math.floor(hours / 24) });
   };
 
   if (loading) {
     return (
       <View className="mt-6 px-4">
         <Text className="mb-4 text-xl font-bold text-text-main dark:text-text-main-dark">
-          Dollar News
+         {t('dxyNews.title')}
         </Text>
 
         <View className="items-center rounded-2xl border border-border-main bg-background-card py-10 dark:border-border-main-dark dark:bg-background-card-dark">
@@ -99,7 +101,7 @@ export default function DXYNews() {
           />
 
           <Text className="mt-3 text-sm text-text-muted dark:text-text-muted-dark">
-            Loading latest news...
+          {t('dxyNews.loading')}
           </Text>
         </View>
       </View>
@@ -111,11 +113,11 @@ export default function DXYNews() {
       <View className="mt-6 px-4">
         <View className="rounded-2xl border border-border-main bg-background-card p-5 dark:border-border-main-dark dark:bg-background-card-dark">
           <Text className="text-base font-semibold text-text-main dark:text-text-main-dark">
-            Dollar News
+          {t('dxyNews.title')}
           </Text>
 
           <Text className="mt-2 text-sm text-text-muted dark:text-text-muted-dark">
-            Unable to load the latest news.
+          {t('dxyNews.error')}
           </Text>
 
           <TouchableOpacity
@@ -123,7 +125,7 @@ export default function DXYNews() {
             className="mt-4 self-start rounded-lg bg-primary px-4 py-2"
           >
             <Text className="font-semibold text-white">
-              Try again
+            {t('dxyNews.retry')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -138,11 +140,11 @@ export default function DXYNews() {
       <View className="mb-4 flex-row items-center justify-between">
         <View>
           <Text className="text-xl font-bold text-text-main dark:text-text-main-dark">
-            Dollar News
+          {t('dxyNews.title')}
           </Text>
 
           <Text className="mt-1 text-xs text-text-muted dark:text-text-muted-dark">
-            Latest market-moving stories
+          {t('dxyNews.subtitle')}
           </Text>
         </View>
 
@@ -209,7 +211,7 @@ export default function DXYNews() {
       {articles.length === 0 && (
         <View className="rounded-2xl border border-border-main bg-background-card p-6 dark:border-border-main-dark dark:bg-background-card-dark">
           <Text className="text-center text-sm text-text-muted dark:text-text-muted-dark">
-            No recent dollar news found.
+          {t('dxyNews.empty')}
           </Text>
         </View>
       )}

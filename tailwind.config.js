@@ -41,6 +41,7 @@ module.exports = {
           DEFAULT: '#d97706',
           dark: '#fbbf24',
         },
+        link: '#2563eb',
         accent: '#FFC629',
       },
     },

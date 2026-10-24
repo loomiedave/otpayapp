@@ -1,255 +1,314 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { Feather } from '@expo/vector-icons';
-import CountryFlag from 'react-native-country-flag';
-import ViewShot from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
-import ScreenContainer from '../../../components/ui/ScreenContainer';
-import ScreenHeader from '../../../components/ui/ScreenHeader';
-import { useTheme } from '../../../contexts/ThemeContext';
+import { StatusBar } from 'expo-status-bar';
+import { Feather } from '@expo/vector-icons';
+import ViewShot from 'react-native-view-shot';
+import * as MediaLibrary from 'expo-media-library';
+import CountryFlag from 'react-native-country-flag';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
+
+import { useTranslation } from 'react-i18next';
+
 import { supabase } from '@/lib/supabase';
-import { useCountries } from '@/hooks/useCountries';
 import { formatRate } from '@/lib/currency';
 
-const ACCENT_GOLD = '#D4A62B';
+import { useCountries } from '@/hooks/useCountries';
 
-type TransferStatus = 'pending_verification' | 'confirmed' | 'paid_out' | 'failed';
+import { Transfer, TransferStatus } from '@/types/transactions';
 
-interface Transfer {
-  id: string;
-  recipient_name: string;
-  recipient_phone: string;
-  from_country: string;
-  to_country: string;
-  network: string | null;
-  amount_sent: number;
-  amount_received: number;
-  fee: number;
-  rate_used: number;
-  status: TransferStatus;
-  collection_reference: string | null;
-  payout_reference: string | null;
-  created_at: string;
-}
+const NAVY = '#0E2F6B';
+const INK = '#0B2A66';
+const LABEL = '#5B93D3';
+const HAIRLINE = '#E4E9F2';
+const GOLD = '#D4A62B';
+const SCALLOP = 14;
 
-const STATUS_META: Record<TransferStatus, { color: string; label: string; icon: keyof typeof Feather.glyphMap }> = {
-  pending_verification: { color: '#d97706', label: 'Pending verification', icon: 'clock' },
-  confirmed: { color: '#d97706', label: 'Sending…', icon: 'send' },
-  paid_out: { color: '#16a34a', label: 'Completed', icon: 'check' },
-  failed: { color: '#dc2626', label: 'Failed', icon: 'x' },
+const STATUS_META: Record<TransferStatus, { label: string; color: string }> = {
+  pending_verification: { label: 'transactionDetail.statusPendingVerification', color: '#B45309' },
+  confirmed: { label: 'transactionDetail.statusConfirmed', color: '#B45309' },
+  paid_out: { label: 'transactionDetail.statusPaidOut', color: '#15803D' },
+  failed: { label: 'transactionDetail.statusFailed', color: '#B91C1C' },
 };
 
-const NETWORK_LABELS: Record<string, string> = {
-  mtn: 'MTN MoMo',
-  flooz: 'Flooz',
-  tmoney: 'T-Money',
-};
+const NETWORK_LABELS: Record<string, string> = { mtn: 'MTN MoMo', flooz: 'Flooz', tmoney: 'T-Money' };
 
 function initials(name: string): string {
   return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase()).join('');
 }
 
+function formatStamp(iso: string, locale: string, t: (key: string, options?: any) => string): string {
+  const d = new Date(iso);
+  const date = d.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
+  const time = d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  return t('transactionDetail.dateAt', { date, time });
+}
+
+function Scallops({ edge }: { edge: 'top' | 'bottom' }) {
+  return (
+    <View
+      pointerEvents="none"
+      style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        [edge]: -SCALLOP / 2,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+      }}
+    >
+      {Array.from({ length: 22 }).map((_, i) => (
+        <View key={i} style={{ width: SCALLOP, height: SCALLOP, borderRadius: SCALLOP / 2, backgroundColor: NAVY }} />
+      ))}
+    </View>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <View style={{ marginBottom: 20 }}>
+      <Text style={{ color: LABEL, fontSize: 13.5, fontWeight: '500', marginBottom: 4 }}>{label}</Text>
+      {children}
+    </View>
+  );
+}
+
+function Value({ children, color, size = 19 }: { children: React.ReactNode; color?: string; size?: number }) {
+  return <Text style={{ color: color ?? INK, fontSize: size, fontWeight: '600' }}>{children}</Text>;
+}
+
+function ActionPill({
+  icon, label, onPress, loading, disabled,
+}: {
+  icon: keyof typeof Feather.glyphMap;
+  label: string;
+  onPress: () => void;
+  loading: boolean;
+  disabled: boolean;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      style={({ pressed }) => ({
+        flex: 1,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: '#fff',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: pressed || disabled ? 0.7 : 1,
+      })}
+    >
+      {loading ? (
+        <ActivityIndicator size="small" color={INK} />
+      ) : (
+        <>
+          <Feather name={icon} size={18} color={INK} style={{ marginRight: 10 }} />
+          <Text style={{ color: INK, fontSize: 16, fontWeight: '600' }}>{label}</Text>
+        </>
+      )}
+    </Pressable>
+  );
+}
+
 export default function TransactionDetailScreen(): React.JSX.Element {
-  const { isDark } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { t, i18n } = useTranslation();
   const { getCountry } = useCountries();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [transfer, setTransfer] = useState<Transfer | null>(null);
   const [loading, setLoading] = useState(true);
-  const [sharing, setSharing] = useState(false);
+  const [busy, setBusy] = useState<'share' | 'download' | null>(null);
   const shotRef = useRef<any>(null);
 
   useEffect(() => {
     if (!id) return;
-    supabase.from('transfers').select('*').eq('id', id).single().then(({ data }) => {
+     supabase.from('transfers').select('*').eq('id', id).single().then(({ data }) => {
       if (data) setTransfer(data as Transfer);
       setLoading(false);
     });
   }, [id]);
 
-  if (loading) {
-    return (
-      <ScreenContainer>
-        <ScreenHeader title="Transaction Details" />
-        <View className="flex-1 items-center justify-center py-20"><ActivityIndicator /></View>
-      </ScreenContainer>
-    );
-  }
+  const capture = async (): Promise<string | null> => {
+    if (!shotRef.current?.capture) return null;
+    return shotRef.current.capture();
+  };
 
-  if (!transfer) {
+  const handleShare = async (): Promise<void> => {
+    setBusy('share');
+    try {
+      const uri = await capture();
+      if (!uri) return;
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: t('transactionDetail.shareDialogTitle') });
+      } else {
+        Alert.alert(t('transactionDetail.sharingUnavailableTitle'), t('transactionDetail.sharingUnavailableMessage'));
+      }
+    } catch {
+      Alert.alert(t('transactionDetail.couldNotShareTitle'), t('transactionDetail.retryMessage'));
+    } finally {
+      setBusy(null);
+    }
+  };
+  
+  const handleDownload = async (): Promise<void> => {
+    setBusy('download');
+    try {
+      const { status } = await MediaLibrary.requestPermissionsAsync(true);
+      if (status !== 'granted') {
+        Alert.alert(t('transactionDetail.permissionTitle'), t('transactionDetail.permissionMessage'));
+        return;
+      }
+      const uri = await capture();
+      if (!uri) return;
+      await MediaLibrary.saveToLibraryAsync(uri);
+      Alert.alert(t('transactionDetail.savedTitle'), t('transactionDetail.savedMessage'));
+    } catch {
+      Alert.alert(t('transactionDetail.couldNotSaveTitle'), t('transactionDetail.retryMessage'));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  if (loading || !transfer) {
     return (
-      <ScreenContainer>
-        <ScreenHeader title="Transaction Details" />
-        <View className="flex-1 items-center justify-center py-20">
-          <Text className={isDark ? 'text-text-muted-dark' : 'text-text-muted'}>Transaction not found.</Text>
-        </View>
-      </ScreenContainer>
+      <View style={{ flex: 1, backgroundColor: NAVY, alignItems: 'center', justifyContent: 'center' }}>
+        <StatusBar style="light" />
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <>
+              <Text style={{ color: '#fff', marginBottom: 16 }}>{t('transactionDetail.notFound')}</Text>            <Pressable onPress={() => router.back()}>
+              <Text style={{ color: GOLD, fontWeight: '700' }}>{t('transactionDetail.goBack')}</Text>            </Pressable>
+          </>
+        )}
+      </View>
     );
   }
 
   const toCountry = getCountry(transfer.to_country);
   const fromCountry = getCountry(transfer.from_country);
-  const meta = STATUS_META[transfer.status];
+  const status = STATUS_META[transfer.status];
   const reference = `TX-${transfer.id.slice(0, 8).toUpperCase()}`;
-  const isSimulatedPayout = transfer.payout_reference ?? false;
-
-  const receiptBg = isDark ? '#15191f' : '#ffffff';
-  const dividerColor = isDark ? '#2a2f38' : '#e8e8ec';
-  const mutedText = isDark ? '#8a8f98' : '#9a9da3';
-  const mainText = isDark ? '#f4f4f5' : '#18181b';
-
-  const handleShareImage = async (): Promise<void> => {
-    if (!shotRef.current?.capture) return;
-    setSharing(true);
-    try {
-      const uri = await shotRef.current.capture();
-      const available = await Sharing.isAvailableAsync();
-      if (available) await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: 'Share receipt' });
-      else Alert.alert('Sharing not available', 'Sharing is not supported on this device.');
-    } catch {
-      Alert.alert('Could not create receipt image', 'Please try again.');
-    } finally {
-      setSharing(false);
-    }
-  };
-
-  const Row = ({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) => (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10 }}>
-      <Text style={{ color: mutedText, fontSize: 13 }}>{label}</Text>
-      <Text style={{ color: valueColor ?? mainText, fontSize: 13, fontWeight: '600', maxWidth: 190 }} numberOfLines={1}>
-        {value}
-      </Text>
-    </View>
-  );
+  const isSimulated = transfer.payout_reference?.startsWith('SIMULATED-') ?? false;
+  const total = transfer.amount_sent + transfer.fee;
 
   return (
-    <ScreenContainer scroll>
-      <ScreenHeader title="Transaction Details" />
+    <View style={{ flex: 1, backgroundColor: NAVY }}>
+      <StatusBar style="light" />
 
-      <ViewShot ref={shotRef} options={{ format: 'png', quality: 1 }}>
-        <View style={{ backgroundColor: receiptBg, borderRadius: 24, paddingTop: 28, paddingBottom: 24, paddingHorizontal: 24 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 20, paddingTop: insets.top + 8, paddingBottom: 6 }}>
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={10}
+          style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.7)', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Feather name="x" size={18} color="#fff" />
+        </Pressable>
+      </View>
 
-          {/* Brand mark */}
-          <View style={{ alignItems: 'center', marginBottom: 20 }}>
-            <Text style={{ color: ACCENT_GOLD, fontWeight: '800', fontSize: 15, letterSpacing: 1 }}>OTIPAY</Text>
-          </View>
+      <ScrollView contentContainerStyle={{ paddingBottom: 16 }} showsVerticalScrollIndicator={false}>
+        <ViewShot ref={shotRef} options={{ format: 'png', quality: 1 }} style={{ backgroundColor: NAVY, padding: 18 }}>
+          <View style={{ backgroundColor: '#fff', paddingHorizontal: 22, paddingVertical: 34 }}>
+            <Scallops edge="top" />
+            <Scallops edge="bottom" />
 
-          {/* Status icon */}
-          <View style={{ alignItems: 'center', marginBottom: 14 }}>
-            <View
-              style={{
-                width: 56, height: 56, borderRadius: 28,
-                alignItems: 'center', justifyContent: 'center',
-                backgroundColor: `${meta.color}1a`,
-              }}
-            >
-              <Feather name={meta.icon} size={24} color={meta.color} />
+            <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+              <Text style={{ fontSize: 34, fontWeight: '900', fontStyle: 'italic', color: INK, letterSpacing: -1 }}>Oti</Text>
+              <Text style={{ fontSize: 34, fontWeight: '900', fontStyle: 'italic', color: GOLD, letterSpacing: -1 }}>Pay</Text>
+            </View>
+
+            <Text style={{ fontSize: 26, fontWeight: '800', color: INK, marginTop: 26 }}>Money Transfer</Text>
+            <Text style={{ fontSize: 13.5, color: LABEL, marginTop: 8 }}>
+              {t('transactionDetail.refLine', { reference, stamp: formatStamp(transfer.created_at, i18n.language, t) })}
+            </Text>
+
+            <View style={{ height: 1, backgroundColor: HAIRLINE, marginTop: 18, marginBottom: 22 }} />
+
+            <View style={{ paddingLeft: 16 }}>
+              <Field label="Recipient">
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: '#EAF0FA', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
+                    <Text style={{ color: INK, fontWeight: '800', fontSize: 12 }}>{initials(transfer.recipient_name)}</Text>
+                  </View>
+                  <Value>{transfer.recipient_name}</Value>
+                </View>
+              </Field>
+
+              <Field label="Recipient number">
+                <Value>{transfer.recipient_phone}</Value>
+              </Field>
+
+              <Field label="Corridor">
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {fromCountry.code ? <CountryFlag isoCode={fromCountry.code} size={18} /> : null}
+                  <Text style={{ color: INK, fontSize: 19, fontWeight: '600', marginHorizontal: 8 }}>{fromCountry.name}</Text>
+                  <Feather name="arrow-right" size={16} color={INK} />
+                  <View style={{ width: 8 }} />
+                  {toCountry.code ? <CountryFlag isoCode={toCountry.code} size={18} /> : null}
+                  <Text style={{ color: INK, fontSize: 19, fontWeight: '600', marginLeft: 8 }}>{toCountry.name}</Text>
+                </View>
+              </Field>
+
+              {transfer.network ? (
+                <Field label="Network">
+                  <Value>{NETWORK_LABELS[transfer.network] ?? transfer.network}</Value>
+                </Field>
+              ) : null}
+
+              <Field label="Status">
+                <Value color={status.color}>{status.label}</Value>
+              </Field>
+
+              <Field label="Amount sent">
+                <Value>{formatRate(transfer.amount_sent)} {fromCountry.currency_code}</Value>
+              </Field>
+
+              <Field label="Fee">
+                <Value>{formatRate(transfer.fee)} {fromCountry.currency_code}</Value>
+              </Field>
+
+              <Field label="Exchange rate">
+                <Value>1 {fromCountry.currency_code} = {formatRate(transfer.rate_used)} {toCountry.currency_code}</Value>
+              </Field>
+
+              <Field label="Recipient receives">
+                <Value>{formatRate(transfer.amount_received)} {toCountry.currency_code}</Value>
+              </Field>
+
+              {transfer.collection_reference ? (
+                <Field label="Collection reference">
+                  <Value size={14}>{transfer.collection_reference}</Value>
+                </Field>
+              ) : null}
+
+              {transfer.payout_reference ? (
+                <Field label="Payout reference">
+                  <Value size={14} color={isSimulated ? '#B45309' : undefined}>{transfer.payout_reference}</Value>
+                </Field>
+              ) : null}
+            </View>
+
+            <View style={{ height: 1, backgroundColor: HAIRLINE, marginBottom: 20 }} />
+
+            <View style={{ paddingLeft: 16 }}>
+              <Text style={{ color: LABEL, fontSize: 13.5, fontWeight: '500' }}>Total Amount</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline', marginTop: 4 }}>
+                <Text style={{ color: INK, fontSize: 44, fontWeight: '800' }}>{formatRate(total)}</Text>
+                <Text style={{ color: INK, fontSize: 24, fontWeight: '700', marginLeft: 8 }}>{fromCountry.currency_code}</Text>
+              </View>
             </View>
           </View>
+        </ViewShot>
+      </ScrollView>
 
-          {/* Big amount */}
-          <View style={{ alignItems: 'center', marginBottom: 6 }}>
-            <Text style={{ color: mainText, fontSize: 40, fontWeight: '800', letterSpacing: -0.5 }}>
-              {formatRate(transfer.amount_received)}
-            </Text>
-            <Text style={{ color: mutedText, fontSize: 14, fontWeight: '600', marginTop: 2 }}>
-              {toCountry.currency_code}
-            </Text>
-          </View>
-
-          <View style={{ alignItems: 'center', marginBottom: 20 }}>
-            <Text style={{ color: meta.color, fontSize: 13, fontWeight: '700' }}>{meta.label}</Text>
-          </View>
-
-          {/* Recipient */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
-            <View
-              style={{
-                width: 36, height: 36, borderRadius: 18,
-                backgroundColor: isDark ? '#2a2f38' : '#f0f0f3',
-                alignItems: 'center', justifyContent: 'center', marginRight: 10,
-              }}
-            >
-              <Text style={{ color: mainText, fontWeight: '700', fontSize: 13 }}>{initials(transfer.recipient_name)}</Text>
-            </View>
-            <View>
-              <Text style={{ color: mainText, fontWeight: '700', fontSize: 15 }}>{transfer.recipient_name}</Text>
-              <Text style={{ color: mutedText, fontSize: 12 }}>{transfer.recipient_phone}</Text>
-            </View>
-          </View>
-
-          {/* Route pill */}
-          <View
-            style={{
-              flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-              backgroundColor: isDark ? '#1f242c' : '#f7f7f9',
-              borderRadius: 100, paddingVertical: 8, marginBottom: 22, gap: 8,
-            }}
-          >
-            {fromCountry.code && <CountryFlag isoCode={fromCountry.code} size={14} />}
-            <Text style={{ color: mutedText, fontSize: 12, fontWeight: '600' }}>{fromCountry.name}</Text>
-            <Feather name="arrow-right" size={12} color={mutedText} />
-            {toCountry.code && <CountryFlag isoCode={toCountry.code} size={14} />}
-            <Text style={{ color: mutedText, fontSize: 12, fontWeight: '600' }}>{toCountry.name}</Text>
-          </View>
-
-          {/* Dashed ticket divider */}
-          <View style={{ flexDirection: 'row', marginBottom: 16 }}>
-            {Array.from({ length: 28 }).map((_, i) => (
-              <View key={i} style={{ flex: 1, height: 1, backgroundColor: i % 2 === 0 ? dividerColor : 'transparent' }} />
-            ))}
-          </View>
-
-          {/* Details */}
-          <Row label="Amount sent" value={`${formatRate(transfer.amount_sent)} ${fromCountry.currency_code}`} />
-          <Row label="Fee" value={`${formatRate(transfer.fee)} ${fromCountry.currency_code}`} />
-          <Row label="Exchange rate" value={`1 ${fromCountry.currency_code} = ${formatRate(transfer.rate_used)} ${toCountry.currency_code}`} />
-          {transfer.network && <Row label="Network" value={NETWORK_LABELS[transfer.network] ?? transfer.network} />}
-          <Row
-            label="Date"
-            value={new Date(transfer.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
-          />
-          {transfer.collection_reference && <Row label="Collection ref." value={transfer.collection_reference} />}
-          {transfer.payout_reference && (
-            <Row
-              label="Payout ref."
-              value={transfer.payout_reference}
-              valueColor={isSimulatedPayout ? '#d97706' : undefined}
-            />
-          )}
-
-          {/* Dashed divider */}
-          <View style={{ flexDirection: 'row', marginTop: 16, marginBottom: 14 }}>
-            {Array.from({ length: 28 }).map((_, i) => (
-              <View key={i} style={{ flex: 1, height: 1, backgroundColor: i % 2 === 0 ? dividerColor : 'transparent' }} />
-            ))}
-          </View>
-
-          <View style={{ alignItems: 'center' }}>
-            <Text style={{ color: mutedText, fontSize: 11, fontFamily: 'monospace', letterSpacing: 0.5 }}>
-              {reference}
-            </Text>
-          </View>
-        </View>
-      </ViewShot>
-
-      <Pressable
-        onPress={handleShareImage}
-        disabled={sharing}
-        className="flex-row items-center justify-center mt-6 py-3 active:opacity-70"
-        style={{ borderRadius: 14, backgroundColor: isDark ? '#1e293b' : '#f1f5f9' }}
-      >
-        {sharing ? (
-          <ActivityIndicator size="small" />
-        ) : (
-          <>
-            <Feather name="image" size={16} color={isDark ? '#e2e8f0' : '#334155'} style={{ marginRight: 8 }} />
-            <Text className={isDark ? 'text-text-main-dark text-sm font-semibold' : 'text-text-main text-sm font-semibold'}>
-              Share Receipt
-            </Text>
-          </>
-        )}
-      </Pressable>
-    </ScreenContainer>
+      <View style={{ flexDirection: 'row', gap: 14, paddingHorizontal: 20, paddingTop: 10, paddingBottom: insets.bottom + 12 }}>
+        <ActionPill icon="download" label="Download" onPress={handleDownload} loading={busy === 'download'} disabled={busy !== null} />
+        <ActionPill icon="share-2" label="Share" onPress={handleShare} loading={busy === 'share'} disabled={busy !== null} />
+      </View>
+    </View>
   );
 }

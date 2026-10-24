@@ -72,7 +72,7 @@ export default function RecipientPicker({
           );
         })}
 
-        <Pressable className="items-center" onPress={() => router.push('/add-recipient')}>
+        <Pressable className="items-center" onPress={() => router.push('/(tabs)/recipients/add-recipient')}>
           <View
             className={
               isDark

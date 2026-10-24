@@ -4,6 +4,8 @@ import React, {  useState, useCallback } from 'react';
 
 import { supabase } from '@/lib/supabase';
 
+import { Transfer } from '@/types/transactions';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -13,14 +15,13 @@ import ScreenContainer from '@/components/ui/ScreenContainer'
 import TransactionItem from '@/components//transactions/TransactionItem';
 import EmptyTransactions from '@/components/transactions/EmptyTransactions';
 
-import { Transfer } from '@/types/transactions';
-
 export default function TransactionsScreen(): React.JSX.Element {
   const { isDark } = useTheme();
   const { session } = useAuth();
-  const [transfers, setTransfers] = useState<Transfer[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [transfers, setTransfers] = useState<Transfer[]>([]);
 
   const fetchTransfers = useCallback(async () => {
     if (!session?.user?.id) return;
@@ -54,7 +55,7 @@ export default function TransactionsScreen(): React.JSX.Element {
 
   return (
     <ScreenContainer scroll refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}>
-      <ScreenHeader title="Transactions" />
+      <ScreenHeader title="Transactions" showBackButton={false} />
         {transfers.length === 0 ? (
             <EmptyTransactions isDark={isDark} />
           ) : (

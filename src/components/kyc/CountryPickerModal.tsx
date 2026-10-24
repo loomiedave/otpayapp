@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, Pressable, Modal } from 'react-native';
+
 import { useTheme } from '@/contexts/ThemeContext';
+
 import { COUNTRIES, ALL_COUNTRY_CODES, CountryCode } from '@/constants/countries';
 
 interface CountryPickerModalProps {
@@ -11,6 +13,7 @@ interface CountryPickerModalProps {
 
 export default function CountryPickerModal({ visible, onSelect, onClose }: CountryPickerModalProps): React.JSX.Element {
   const { isDark } = useTheme();
+  
   const cardClass = isDark
     ? 'rounded-2xl bg-background-card-dark border border-border-main-dark'
     : 'rounded-2xl bg-background-card border border-border-main';

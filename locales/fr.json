@@ -1,87 +1,226 @@
 {
+  "common": {
+    "error_title": "Une erreur s'est produite",
+    "error_try_again": "Veuillez réessayer.",
+    "retry": "Réessayer"
+  },
+
+  "dxyChart": {
+    "collecting": "Collecte des données du graphique...",
+    "error": "Impossible de charger le DXY",
+    "loading": "Chargement du DXY...",
+    "title": "Indice du dollar américain",
+    "updated": "Mise à jour toutes les minutes"
+  },
+
+  "dxyNews": {
+    "days_ago": "il y a {{count}} j",
+    "empty": "Aucune actualité récente sur le dollar.",
+    "error": "Impossible de charger les dernières actualités.",
+    "hours_ago": "il y a {{count}} h",
+    "just_now": "À l'instant",
+    "loading": "Chargement des dernières actualités...",
+    "minutes_ago": "il y a {{count}} min",
+    "retry": "Réessayer",
+    "source": "Actualités financières",
+    "subtitle": "Les dernières actualités qui font bouger le marché",
+    "title": "Actualités du dollar"
+  },
+
   "home": {
-    "welcome-back": "Bon retour",
-    "quick_actions": "Actions rapides",
-    "send_money": "Envoyer de l'argent",
     "add": "Ajouter",
+    "exchange_rates": "Taux de change",
+    "live_rate": "TARIF EN DIRECT",
     "my_activity": "Mon activité",
+    "no_fee_transfer": "Aucun frais sur ce transfert",
+    "quick_actions": "Actions rapides",
     "recent_transactions": "Transactions récentes",
     "see_all": "Voir tout",
+    "send_money": "Envoyer",
     "today": "Aujourd'hui",
+    "transactions": "Transactions",
+    "view_other_rates": "Voir d'autres taux",
+    "welcome_back": "Bon retour",
     "yesterday": "Hier"
   },
-  "send":{
-    "title": "Envoyer d'argen",
-     "recipient": "Bénéficiaire",
-     "addNew": "Ajouter un nouveau",
-     "noRecipients": "Aucun destinataire pour l'instant — ajoutez-en un pour envoyer de l'argent.",
-     "amount": "MONTANT",
-     "recipientGets": "Le destinataire reçoit",
-     "selectRecipient": "Sélectionnez un destinataire",
-     "fee": "Frais : {{fee}} {{currency}}",
-     "noFee": "Sans frais",
-     "corridorInactive": "{{from}} → {{to}} n'est pas encore disponible.",
-     "continue": "Continuer"
-  },
-  "sendReview": {
-      "title": "Transfert d'avis",
-      "isReceiving": "en train de recevoir",
-      "youSend": "Vous envoyez",
-      "transferFee": "Frais de transfert",
-      "exchangeRate": "Taux de change",
-      "total": "Total",
-      "confirm": "Confirmer et envoyer "
-    },
-  "rates": {
-    "live_rate": "Taux en direct",
-    "date_range_jan_dec": "Janvier à décembre",
-    "no_fee_transfer": "Aucun frais sur ce transfert",
-    "equals": "Égal à",
-    "coming_soon": "Bientôt disponible",
-    "view_other_rates": "Voir d'autres taux"
-  },
-  "status": {
-    "pending": "En attente",
-    "approved": "Approuvé",
-    "rejected": "Rejeté",
-    "fee": "Frais"
-  },
+
   "nav": {
     "home": "Accueil",
+    "markets": "Marché",
+    "more": "Plus",
     "recipients": "Bénéficiaires",
-    "transactions": "Transactions",
-    "more": "Plus"
+    "transactions": "Transactions"
   },
-  "verification": {
-    "verify_account_prompt": "Vérifiez votre compte OtiPay en soumettant vos informations",
-    "choose_documents": "Choisissez parmi notre liste de documents acceptés",
-    "identity_verification": "Vérification d'identité",
-    "identity_verified": "Identité vérifiée"
+
+"profile": {
+  "date_of_birth": "Date de naissance",
+  "email": "E-mail",
+  "full_name": "Nom complet",
+  "full_name_placeholder": "Votre nom légal complet",
+  "kyc_submitted_message": "Vos documents sont en cours de vérification. Nous vous enverrons un e-mail.",
+  "kyc_submitted_title": "Soumis",
+  "manage_personal_info": "Gérez vos informations personnelles",
+  "personal_details": "Informations personnelles",
+  "personal_information": "Informations personnelles",
+  "phone": "Téléphone",
+  "phone_placeholder": "Votre numéro de téléphone",
+  "save_error_message": "Impossible d'enregistrer. Veuillez réessayer.",
+  "update_details_contact_us": "Pour mettre à jour vos informations personnelles, contactez-nous via le chat en direct",
+  "update_details_prefix": "Pour mettre à jour vos informations personnelles, contactez-nous via le"
+},
+
+  "rates": {
+    "coming_soon": "Bientôt disponible",
+    "date_range_jan_dec": "Janvier à décembre",
+    "equals": "Égal à",
+    "live_rate": "Taux en direct",
+    "no_fee_transfer": "Aucun frais sur ce transfert",
+    "view_other_rates": "Voir d'autres taux"
   },
-  "profile": {
-    "personal_details": "Informations personnelles",
-    "manage_personal_info": "Gérez vos informations personnelles",
-    "personal_information": "Informations personnelles",
-    "full_name": "Nom complet",
-    "date_of_birth": "Date de naissance",
-    "phone": "Téléphone",
-    "email": "E-mail",
-    "update_details_contact_us": "Pour mettre à jour vos informations personnelles, contactez-nous via le chat en direct"
+
+  "recipients": {
+    "add_error": "Impossible d'enregistrer le bénéficiaire. Réessayez.",
+    "add_new": "Ajouter un bénéficiaire",
+    "add_title": "Ajouter un bénéficiaire",
+    "cancel": "Annuler",
+    "coming_soon": "Bientôt disponible",
+    "confirm_delete": "Supprimer {{name}} ?",
+    "country": "PAYS",
+    "currency_info": "Vous pourrez envoyer de l'argent à ce bénéficiaire en {{currency}}.",
+    "delete": "Supprimer le bénéficiaire",
+    "delete_action": "Supprimer",
+    "delete_error": "Impossible de supprimer le bénéficiaire. Réessayez.",
+    "empty_description": "Ajoutez un bénéficiaire pour commencer à envoyer de l’argent à l’étranger.",
+    "empty_title": "Aucun bénéficiaire pour le moment",
+    "error": "Erreur",
+    "full_name": "NOM COMPLET",
+    "load_error": "Impossible de charger les bénéficiaires.",
+    "name_placeholder": "Saisissez le nom du bénéficiaire",
+    "phone": "TÉLÉPHONE",
+    "phone_placeholder": "Numéro du bénéficiaire",
+    "save": "Enregistrer le bénéficiaire",
+    "saving": "Enregistrement…",
+    "title": "Bénéficiaires"
   },
+
   "security": {
-    "title": "Sécurité",
-    "subtitle": "Code PIN, biométrie, appareils"
+    "subtitle": "Code PIN, biométrie, appareils",
+    "title": "Sécurité"
   },
+
+  "send": {
+    "addNew": "Ajouter un nouveau",
+    "amount": "MONTANT",
+    "approve_payment": "Vérifiez votre téléphone pour approuver le paiement",
+    "checkout_title": "Finaliser le Transfert",
+    "confirmed": "Paiement reçu. Envoi au bénéficiaire en cours…",
+    "continue": "Continuer",
+    "corridorInactive": "{{from}} → {{to}} n'est pas encore disponible.",
+    "could_not_complete": "Nous n'avons pas pu effectuer ce transfert.",
+    "could_not_complete_to": "Nous n'avons pas pu effectuer le transfert vers",
+    "done": "Terminé",
+    "failed": "Transfert échoué",
+    "fee": "Frais : {{fee}} {{currency}}",
+    "network": "Réseau",
+    "networkNotSupported": "Ce numéro de téléphone n'est pas pris en charge.",
+    "no_charge": "Aucun montant supplémentaire n'a été débité au-delà de ce que le réseau de paiement a tenté de prélever.",
+    "noFee": "Sans frais",
+    "noRecipients": "Aucun bénéficiaire pour l'instant — ajoutez-en un pour envoyer de l'argent.",
+    "phonePlaceholder": "Numéro de téléphone du bénéficiaire",
+    "processing": "Traitement en cours…",
+    "recipient": "Bénéficiaire",
+    "recipientGets": "Le bénéficiaire reçoit",
+    "recipientName": "Nom du bénéficiaire",
+    "recipientNamePlaceholder": "Nom complet",
+    "recipientPhone": "Téléphone du bénéficiaire",
+    "selectRecipient": "Sélectionnez un bénéficiaire",
+    "title": "Envoyer de l'argent",
+    "transferSubmitted": "Transfert soumis",
+    "try_again": "Réessayer",
+    "verifyingPayment": "Nous vérifions votre paiement. Une fois confirmé,",
+    "willBeSentTo": "sera envoyé à"
+  },
+
+  "sendReview": {
+    "confirm": "Confirmer et envoyer",
+    "exchangeRate": "Taux de change",
+    "isReceiving": "en train de recevoir",
+    "payerPhoneHint": "Vous recevrez une invitation sur ce numéro pour approuver le paiement.",
+    "payerPhoneLabel": "NUMÉRO À DÉBITER (MTN MOMO)",
+    "payerPhonePlaceholder": "ex. 0242439784",
+    "redirectNotice": "Vous serez redirigé vers une page sécurisée pour finaliser le paiement avec Flooz ou T-Money.",
+    "startError": "Impossible de lancer le transfert. Réessayez.",
+    "title": "Vérifier le transfert",
+    "total": "Total",
+    "transferFee": "Frais de transfert",
+    "youSend": "Vous envoyez"
+  },
+
+  "settings": {
+    "sign_out": "Déconnexion",
+    "subtitle": "Apparence, notifications, sécurité",
+    "title": "Paramètres"
+  },
+
+  "status": {
+    "approved": "Approuvé",
+    "completed": "Terminé",
+    "confirmed": "Confirmé",
+    "failed": "Échoué",
+    "fee": "Frais",
+    "pending": "En attente",
+    "rejected": "Rejeté"
+  },
+
   "support": {
-    "live_chat": "Chat en direct",
-    "talk_to_support": "Parlez à notre équipe d'assistance",
+    "empty_chat": "Envoyez un message et notre équipe vous répondra ici.",
     "help_and_contact": "Aide et contact",
     "help_subtitle": "Consultez la FAQ, écrivez-nous ou appelez-nous",
-    "type_a_message": "Tapez un message"
+    "live_chat": "Chat en direct",
+    "talk_to_support": "Parlez à notre équipe d'assistance",
+    "type_a_message": "Écrire un message..."
   },
-  "settings": {
-    "title": "Paramètres",
-    "subtitle": "Apparence, notifications, sécurité",
-    "sign_out": "Déconnexion"
+
+  "transactionDetail": {
+    "amountSent": "Montant envoyé",
+    "collectionReference": "Référence de paiement",
+    "corridor": "Trajet",
+    "couldNotSaveTitle": "Impossible d'enregistrer le reçu",
+    "couldNotShareTitle": "Impossible de partager le reçu",
+    "dateAt": "{{date}} à {{time}}",
+    "download": "Télécharger",
+    "exchangeRate": "Taux de change",
+    "fee": "Frais",
+    "goBack": "Retour",
+    "moneyTransfer": "Transfert d'argent",
+    "network": "Réseau",
+    "notFound": "Transaction introuvable.",
+    "payoutReference": "Référence de versement",
+    "permissionMessage": "Autorisez l'accès aux photos pour enregistrer votre reçu.",
+    "permissionTitle": "Autorisation requise",
+    "recipient": "Bénéficiaire",
+    "recipientNumber": "Numéro du bénéficiaire",
+    "recipientReceives": "Le bénéficiaire reçoit",
+    "refLine": "Réf. : {{reference}}  |  {{stamp}}",
+    "retryMessage": "Veuillez réessayer.",
+    "savedMessage": "Reçu enregistré dans vos photos.",
+    "savedTitle": "Enregistré",
+    "share": "Partager",
+    "shareDialogTitle": "Partager le reçu",
+    "sharingUnavailableMessage": "Le partage n'est pas pris en charge sur cet appareil.",
+    "sharingUnavailableTitle": "Partage indisponible",
+    "status": "Statut",
+    "statusConfirmed": "En cours d'envoi",
+    "statusFailed": "Échoué",
+    "statusPaidOut": "Terminé",
+    "statusPendingVerification": "Vérification en attente",
+    "totalAmount": "Montant total"
+  },
+
+  "verification": {
+    "choose_documents": "Choisissez parmi notre liste de documents acceptés",
+    "identity_verification": "Vérification d'identité",
+    "identity_verified": "Identité vérifiée",
+    "verify_account_prompt": "Vérifiez votre compte OtiPay en soumettant vos informations"
   }
 }

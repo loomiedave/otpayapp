@@ -8,6 +8,8 @@ import { formatDate } from '@/lib/helperFunctions';
 
 import { useCountries } from '@/hooks/useCountries';
 
+import { useTranslation } from 'react-i18next';
+
 import { Transfer, TransferStatus } from '@/types/transactions';
 
 type TransactionItemProps = {
@@ -18,15 +20,16 @@ type TransactionItemProps = {
 };
 
 const STATUS_STYLES: Record<TransferStatus, { light: string; dark: string; label: string }> = {
-  pending_verification: { light: '#d97706', dark: '#fbbf24', label: 'Pending' },
-  confirmed: { light: '#d97706', dark: '#fbbf24', label: 'Confirmed' },
-  paid_out: { light: '#16a34a', dark: '#4ade80', label: 'Completed' },
-  failed: { light: '#dc2626', dark: '#f87171', label: 'Failed' },
+  pending_verification: { light: '#d97706', dark: '#fbbf24', label: 'status.pending' },
+  confirmed: { light: '#d97706', dark: '#fbbf24', label: 'status.confirmed' },
+  paid_out: { light: '#16a34a', dark: '#4ade80', label: 'status.completed' },
+  failed: { light: '#dc2626', dark: '#f87171', label: 'status.failed' },
 };
 
 export default function TransactionItem({ tx, index, total, isDark, }: TransactionItemProps) {
   const router = useRouter();
   const { getCountry } = useCountries();
+  const { t } = useTranslation()
 
   const statusColor = isDark
     ? STATUS_STYLES[tx.status].dark
@@ -106,7 +109,7 @@ export default function TransactionItem({ tx, index, total, isDark, }: Transacti
             className="text-xs font-medium"
             style={{ color: statusColor }}
           >
-            {STATUS_STYLES[tx.status].label}
+            {t(STATUS_STYLES[tx.status].label)}
           </Text>
         </View>
       </View>

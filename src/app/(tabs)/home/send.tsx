@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
@@ -6,20 +7,18 @@ import { View, Text, ActivityIndicator } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { detectNetwork } from '@/lib/send/networkDetection';
 
-import { Feather } from '@expo/vector-icons';
-
 import { SUPPORTED_COUNTRY_CODES } from '@/constants/countries';
 
-import { useAuth } from '../../../contexts/AuthContext';
-import { useTheme } from '../../../contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 import { useCountries } from '@/hooks/useCountries';
 import { useExchangeRates } from '@/hooks/useExchangeRates';
 
-import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
-import ScreenHeader from '../../../components/ui/ScreenHeader';
-import ScreenContainer from '../../../components/ui/ScreenContainer';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import ScreenHeader from '@/components/ui/ScreenHeader';
+import ScreenContainer from '@/components/ui/ScreenContainer';
 
 import PhoneField from '@/components/send/PhoneField';
 import AmountField from '@/components/send/AmountField';
@@ -126,8 +125,7 @@ export default function SendScreen(): React.JSX.Element {
   // Round once, at the end, to the destination currency (XOF = 0 decimals, others = 2).
   const decimals = toCountry && getCountry(toCountry)?.currency_code === 'XOF' ? 0 : 2;
   const factor = 10 ** decimals;
-  const netCents = Math.max(Math.round(numericAmount * 100) - Math.round(fee * 100), 0);
-  const convertedAmount = Math.round((netCents / 100) * rate * factor) / factor;
+  const convertedAmount = Math.round(numericAmount * rate * factor) / factor;
 
   const cardClass = isDark
     ? 'rounded-2xl bg-background-card-dark border border-border-main-dark'
@@ -183,7 +181,7 @@ export default function SendScreen(): React.JSX.Element {
         <View className="flex-1 items-center justify-center py-20 px-6">
           <Feather name="alert-circle" size={28} color={isDark ? '#f87171' : '#dc2626'} />
           <Text className={isDark ? 'text-text-main-dark text-sm text-center mt-3 mb-4' : 'text-text-main text-sm text-center mt-3 mb-4'}>
-            {t('send.recipientsLoadError')}
+             {t('recipients.load_error')}
           </Text>
           <Button label={t('common.retry')} onPress={loadRecipients} />
         </View>
@@ -208,10 +206,10 @@ export default function SendScreen(): React.JSX.Element {
       {!selectedRecipient && (
         <>
           <Text className={isDark ? 'text-text-muted-dark text-xs mb-3 mt-8' : 'text-text-muted text-xs mb-3 mt-8'}>
-            {t('send.recipientName', { defaultValue: 'Recipient name' })}
+            {t('send.recipientName')}
           </Text>
           <Input
-            placeholder={t('send.recipientNamePlaceholder', { defaultValue: 'Full name' })}
+            placeholder={t('send.recipientNamePlaceholder')}
             value={manualName}
             onChangeText={setManualName}
           />
@@ -233,11 +231,11 @@ export default function SendScreen(): React.JSX.Element {
         <View className="mt-3">
           {networkLabel ? (
             <Text className={isDark ? 'text-text-muted-dark text-xs' : 'text-text-muted text-xs'}>
-              {t('send.network', { defaultValue: 'Network' })}: {networkLabel}
+               {t('send.network')}: {networkLabel}
             </Text>
           ) : phone.replace(/\D/g, '').length >= 2 ? (
             <Text style={{ color: isDark ? '#f87171' : '#dc2626', fontSize: 12 }}>
-              {t('send.networkNotSupported', { defaultValue: 'This phone number is not supported.' })}
+              {t('send.networkNotSupported')}
             </Text>
           ) : null}
         </View>

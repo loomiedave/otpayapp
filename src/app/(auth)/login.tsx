@@ -1,22 +1,24 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, Modal } from 'react-native';
-import { useRouter } from 'expo-router';
-import ScreenContainer from '../../components/ui/ScreenContainer';
-import Input from '@/components/ui/Input';
-import Button from '../../components/ui/Button';
-import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { Image } from 'expo-image';
+import React, { useState } from 'react';
+import { useRouter } from 'expo-router';
+import { View, Text, Pressable, Modal } from 'react-native';
+
+import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
+
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import ScreenContainer from '@/components/ui/ScreenContainer';
 
 export default function LoginScreen(): React.JSX.Element {
   const router = useRouter();
   const { isDark } = useTheme();
   const { signIn } = useAuth();
   const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [password, setPassword] = useState<string>('');
   const [serverError, setServerError] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleLogin = async (): Promise<void> => {
     if (!email || !password) {

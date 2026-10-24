@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, Pressable, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { Text, Pressable, Image } from 'react-native';
+
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface ImageSlotProps {
@@ -11,6 +12,7 @@ interface ImageSlotProps {
 
 export default function ImageSlot({ uri, label, onPress }: ImageSlotProps): React.JSX.Element {
   const { isDark } = useTheme();
+
   const cardClass = isDark
     ? 'rounded-2xl bg-background-card-dark border border-border-main-dark'
     : 'rounded-2xl bg-background-card border border-border-main';

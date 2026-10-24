@@ -6,6 +6,7 @@ import {
   View,
   ViewToken,
 } from 'react-native';
+
 import Animated, {
   Extrapolation,
   interpolate,
@@ -16,14 +17,16 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 
-import { Button } from '@/components/Button';
-import { Pagination } from '@/components/Pagination';
 import { data, type Data } from '@/data/screens';
+
 import { useTheme } from '@/contexts/ThemeContext';
 
+import { Button } from '@/components/Button';
+import { Pagination } from '@/components/Pagination';
+
 const RenderItem = ({ item, index, x }: { item: Data; index: number; x: SharedValue<number> }) => {
-  const { width: SCREEN_WIDTH } = useWindowDimensions();
   const { isDark } = useTheme();
+  const { width: SCREEN_WIDTH } = useWindowDimensions();
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
     const opacityAnimation = interpolate(
@@ -84,11 +87,11 @@ const RenderItem = ({ item, index, x }: { item: Data; index: number; x: SharedVa
 };
 
 export default function Onboarding() {
-  const { width: SCREEN_WIDTH } = useWindowDimensions();
-  const { isDark } = useTheme();
-  const flatListRef = useAnimatedRef<FlatList>();
-  const flatListIndex = useSharedValue(0);
   const x = useSharedValue(0);
+  const { isDark } = useTheme();
+  const flatListIndex = useSharedValue(0);
+  const flatListRef = useAnimatedRef<FlatList>();
+  const { width: SCREEN_WIDTH } = useWindowDimensions();
 
   const onViewableItemsChanged = ({
     viewableItems,

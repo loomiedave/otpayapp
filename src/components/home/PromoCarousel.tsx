@@ -1,9 +1,8 @@
-// components/home/PromoCarousel.tsx
-import React, { useRef, useState } from 'react';
-import { View, Text, ScrollView, Pressable, Dimensions, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router'
+import { Feather } from '@expo/vector-icons';
+import React, { useRef, useState } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, ScrollView, Pressable, Dimensions, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 
 export interface PromoCard {
   id: string;
@@ -13,7 +12,6 @@ export interface PromoCard {
   colors: [string, string];
   route?: string
 }
-
 // Placeholder copy — swap for real campaigns when you have them.
 // Written to sound like actual promos this app would run, not filler text.
 const DEFAULT_PROMOS: PromoCard[] = [
@@ -58,9 +56,9 @@ interface PromoCarouselProps {
   onPressCard?: (promo: PromoCard) => void;
 }
 
-export default function PromoCarousel({ promos = DEFAULT_PROMOS, onPressCard }: PromoCarouselProps): React.JSX.Element {
-  const [activeIndex, setActiveIndex] = useState(0);
+export default function PromoCarousel({ promos = DEFAULT_PROMOS }: PromoCarouselProps): React.JSX.Element {
   const scrollRef = useRef<ScrollView>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const handleScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const index = Math.round(e.nativeEvent.contentOffset.x / (CARD_WIDTH + 12));

@@ -1,10 +1,16 @@
+import { Feather } from '@expo/vector-icons';
 import React, { useRef, useState } from 'react';
 import { View, Text, Pressable, Modal, ScrollView, Animated } from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import { COUNTRIES, CountryCode } from '../../constants/countries';
-import { formatRate } from '../../lib/currency';
-import { DirectionalRate } from '../../hooks/useExchangeRates';
-import { useTheme } from '../../contexts/ThemeContext';
+
+import { useTranslation } from 'react-i18next';
+
+import { formatRate } from '@/lib/currency';
+
+import { useTheme } from '@/contexts/ThemeContext';
+
+import { DirectionalRate } from '@/hooks/useExchangeRates';
+
+import { COUNTRIES, CountryCode } from '@/constants/countries';
 
 interface RateTickerProps {
   rates: DirectionalRate[];
@@ -14,9 +20,10 @@ interface RateTickerProps {
 export default function RateTicker({ rates, onSelect }: RateTickerProps): React.JSX.Element {
   const { isDark } = useTheme();
   const [visible, setVisible] = useState(false);
-  const backdropOpacity = useRef(new Animated.Value(0)).current;
-  const cardScale = useRef(new Animated.Value(0.9)).current;
   const cardOpacity = useRef(new Animated.Value(0)).current;
+  const cardScale = useRef(new Animated.Value(0.9)).current;
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const { t } = useTranslation();
 
   const sortedRates = [...rates].sort((a, b) => {
     // Active corridors always come before inactive ones
@@ -65,7 +72,7 @@ export default function RateTicker({ rates, onSelect }: RateTickerProps): React.
         <View className="flex-row items-center">
           <View className="w-1.5 h-1.5 rounded-full mr-2 bg-accent" />
           <Text className={isDark ? 'text-text-main-dark text-sm font-bold' : 'text-text-main text-sm font-bold'}>
-            View other rates
+           {t('home.view_other_rates')}
           </Text>
         </View>
         <Feather name="align-justify" size={16} color={isDark ? '#8A93A6' : '#6B7280'} />
@@ -90,7 +97,7 @@ export default function RateTicker({ rates, onSelect }: RateTickerProps): React.
           >
             <View className="flex-row items-center justify-between px-5 pt-5 pb-3">
               <Text className={isDark ? 'text-text-main-dark text-base font-bold' : 'text-text-main text-base font-bold'}>
-                Exchange rates
+                {t('home.exchange_rates')}
               </Text>
               <Pressable onPress={closeModal} hitSlop={10}>
                 <Feather name="x" size={20} color={isDark ? '#8A93A6' : '#6B7280'} />

@@ -1,26 +1,30 @@
-import { useFocusEffect } from 'expo-router';
+import { View, Text, Pressable } from 'react-native';
+import { useFocusEffect, router } from 'expo-router';
 import { RefreshControl } from 'react-native';
 import React, {  useState, useCallback } from 'react';
 
 import { supabase } from '@/lib/supabase';
 
+import { useTranslation } from 'react-i18next';
+
+import { Transfer } from '@/types/transactions';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 
 import Loading from '@/components/ui/Loading';
-
 import ScreenContainer from '@/components/ui/ScreenContainer';
+
 import TransactionItem from '../transactions/TransactionItem';
 import EmptyTransactions from '../transactions/EmptyTransactions';
-
-import { Transfer } from '@/types/transactions';
 
 export default function RecentTransactions(): React.JSX.Element {
    const { isDark } = useTheme();
     const { session } = useAuth();
-    const [transfers, setTransfers] = useState<Transfer[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [transfers, setTransfers] = useState<Transfer[]>([]);
+    const { t } = useTranslation();
 
       const fetchTransfers = useCallback(async () => {
         if (!session?.user?.id) return;
@@ -56,6 +60,21 @@ export default function RecentTransactions(): React.JSX.Element {
 
       return (
         <ScreenContainer scroll refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}>
+          <View className="flex-row items-center pt-2 pb-4 justify-between">
+            <Text
+              className={
+                isDark
+                  ? 'text-text-main-dark font-bold text-xl'
+                  : 'text-text-main font-bold text-xl'
+              }
+            >
+              {t('home.recent_transactions')}
+            </Text>
+
+            <Pressable onPress={() => router.push('/(tabs)/transactions')}>
+              <Text className="text-link text-lg">{t('home.see_all')}</Text>
+            </Pressable>
+          </View>
           {transfers.length === 0 ? (
             <EmptyTransactions isDark={isDark} />
           ) : (
