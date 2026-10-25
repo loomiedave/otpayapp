@@ -29,8 +29,16 @@
     },
     "plugins": [
       "expo-router",
-      ["expo-media-library", 
-        { "savePhotosPermission": "Allow OTPay to save receipts to your photos." 
+      [
+        "expo-media-library",
+        {
+          "savePhotosPermission": "Allow OTPay to save receipts to your photos."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID to unlock the app."
         }
       ],
       [
@@ -43,7 +51,8 @@
       ],
       "@react-native-community/datetimepicker",
       "expo-localization",
-      "expo-sharing"
+      "expo-sharing",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

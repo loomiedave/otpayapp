@@ -1,5 +1,6 @@
 {
   "common": {
+    "cancel": "Annuler",
     "error_title": "Une erreur s'est produite",
     "error_try_again": "Veuillez réessayer.",
     "retry": "Réessayer"
@@ -42,6 +43,30 @@
     "view_other_rates": "Voir d'autres taux",
     "welcome_back": "Bon retour",
     "yesterday": "Hier"
+  },
+
+  "lock": {
+    "attempts_left": "PIN incorrect. Tentatives restantes : {{count}}",
+    "biometric_prompt": "Déverrouiller OtiPay",
+    "close": "Fermer",
+    "confirm_pin_subtitle": "Saisissez à nouveau le même code PIN.",
+    "confirm_pin_title": "Confirmez votre code PIN",
+    "create_pin_subtitle": "Choisissez un code PIN à 4 chiffres pour protéger l'application.",
+    "create_pin_title": "Créez un code PIN",
+    "delete": "Supprimer",
+    "enter_pin_title": "Saisissez votre code PIN",
+    "forgot_pin": "Code PIN oublié ?",
+    "forgot_pin_confirm_message": "Vous serez déconnecté et votre code PIN sera supprimé. Vous pourrez vous reconnecter avec votre e-mail et votre mot de passe.",
+    "forgot_pin_confirm_title": "Se déconnecter ?",
+    "locked_out": "Trop de tentatives. Réessayez dans {{time}}.",
+    "locked_subtitle": "Confirmez votre identité pour continuer.",
+    "locked_title": "OtiPay est verrouillé",
+    "pin_too_simple": "Choisissez un code PIN moins évident.",
+    "pins_do_not_match": "Les codes PIN ne correspondent pas. Réessayez.",
+    "unlock_biometric": "Déverrouiller",
+    "use_biometric": "Utiliser la biométrie",
+    "verify_pin_subtitle": "Confirmez votre identité pour continuer.",
+    "verify_pin_title": "Saisissez votre code PIN actuel"
   },
 
   "nav": {
@@ -104,7 +129,18 @@
   },
 
   "security": {
-    "subtitle": "Code PIN, biométrie, appareils",
+    "biometric_failed": "Impossible de vérifier votre identité. La connexion biométrique n'a pas été activée.",
+    "biometric_login": "Connexion biométrique",
+    "biometric_not_enrolled": "Configurez d'abord Face ID ou une empreinte digitale dans les réglages de votre appareil.",
+    "biometric_prompt_disable": "Confirmez pour désactiver la connexion biométrique",
+    "biometric_prompt_enable": "Confirmez pour activer la connexion biométrique",
+    "biometric_subtitle": "Utiliser Face ID ou l'empreinte digitale",
+    "biometric_unavailable": "Cet appareil ne prend pas en charge la connexion biométrique.",
+    "lock_hint": "L'application se verrouille si vous la quittez plus de 30 secondes.",
+    "login": "Connexion",
+    "pin_login": "Connexion par code PIN",
+    "pin_subtitle": "Exiger un code PIN à 4 chiffres pour ouvrir l'application",
+    "subtitle": "Connexion par code PIN et biométrie",
     "title": "Sécurité"
   },
 

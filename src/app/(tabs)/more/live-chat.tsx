@@ -72,7 +72,7 @@ export default function LiveChatScreen(): React.JSX.Element {
       />
       <View className="flex-row items-center" style={{ gap: 8, paddingHorizontal: 12 }}>
         <View className="flex-1">
-        <Input placeholder={t('support.type_a_message')} value={draft} onChangeText={setDraft} onSubmitEditing={handleSend} /> </View>
+        <Input placeholder={t('support.type_a_message')} value={draft} onChangeText={setDraft} onSubmitEditing={handleSend} /></View>
         <Pressable
           onPress={handleSend}
           className="w-11 h-11 rounded-full items-center justify-center"

@@ -1,5 +1,6 @@
 {
   "common": {
+    "cancel": "Cancel",
     "error_title": "Something went wrong",
     "error_try_again": "Please try again.",
     "retry": "Try again"
@@ -42,6 +43,30 @@
     "view_other_rates": "View other rates",
     "welcome_back": "Welcome back",
     "yesterday": "Yesterday"
+  },
+
+  "lock": {
+    "attempts_left": "Incorrect PIN. Attempts left: {{count}}",
+    "biometric_prompt": "Unlock OtiPay",
+    "close": "Close",
+    "confirm_pin_subtitle": "Enter the same PIN again.",
+    "confirm_pin_title": "Confirm your PIN",
+    "create_pin_subtitle": "Choose a 4-digit PIN to protect the app.",
+    "create_pin_title": "Create a PIN",
+    "delete": "Delete",
+    "enter_pin_title": "Enter your PIN",
+    "forgot_pin": "Forgot PIN?",
+    "forgot_pin_confirm_message": "You'll be signed out and your PIN will be removed. You can sign in again with your email and password.",
+    "forgot_pin_confirm_title": "Sign out?",
+    "locked_out": "Too many attempts. Try again in {{time}}.",
+    "locked_subtitle": "Verify it's you to continue.",
+    "locked_title": "OtiPay is locked",
+    "pin_too_simple": "Choose a less obvious PIN.",
+    "pins_do_not_match": "PINs do not match. Try again.",
+    "unlock_biometric": "Unlock",
+    "use_biometric": "Use biometrics",
+    "verify_pin_subtitle": "Confirm it's you to continue.",
+    "verify_pin_title": "Enter your current PIN"
   },
 
   "nav": {
@@ -104,7 +129,18 @@
   },
 
   "security": {
-    "subtitle": "Pin, biometrics, devices",
+    "biometric_failed": "Could not verify your identity. Biometric login was not turned on.",
+    "biometric_login": "Biometric login",
+    "biometric_not_enrolled": "Set up Face ID or a fingerprint in your device settings first.",
+    "biometric_prompt_disable": "Confirm to turn off biometric login",
+    "biometric_prompt_enable": "Confirm to turn on biometric login",
+    "biometric_subtitle": "Use Face ID or fingerprint",
+    "biometric_unavailable": "This device does not support biometric login.",
+    "lock_hint": "The app locks when you leave it for more than 30 seconds.",
+    "login": "Login",
+    "pin_login": "PIN login",
+    "pin_subtitle": "Require a 4-digit PIN to open the app",
+    "subtitle": "PIN and biometric login",
     "title": "Security"
   },
 

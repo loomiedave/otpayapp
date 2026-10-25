@@ -13,6 +13,9 @@ import { ThemeProvider as NavigationThemeProvider, DefaultTheme, DarkTheme } fro
 
 import { useHasLaunched } from '@/lib/onboardingStore';
 
+import LockScreen from '@/components/security/LockScreen';
+
+import { AppLockProvider, useAppLock } from '@/contexts/AppLockContext';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ExchangeRatesProvider } from '@/contexts/ExchangeRatesContext';
 import { ThemeProvider as AppThemeProvider, useTheme } from '@/contexts/ThemeContext';
@@ -27,6 +30,7 @@ configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
 function RootNavigator(): React.JSX.Element | null {
   const { isDark } = useTheme();
   const hasLaunched = useHasLaunched();
+  const { ready: lockReady } = useAppLock();
   const { session, isLoading: authLoading } = useAuth();
 
   const backgroundColor = isDark ? '#0f172a' : '#f8fafc';
@@ -36,11 +40,11 @@ function RootNavigator(): React.JSX.Element | null {
   };
 
   useEffect(() => {
-    if (authLoading || hasLaunched === null) return;
+    if (authLoading || hasLaunched === null || !lockReady) return;
     SplashScreen.hideAsync();
-  }, [authLoading, hasLaunched]);
+  }, [authLoading, hasLaunched, lockReady]);
 
-  if (authLoading || hasLaunched === null) return null;
+  if (authLoading || hasLaunched === null || !lockReady) return null;
 
   return (
     <NavigationThemeProvider value={AppTheme}>
@@ -75,9 +79,12 @@ export default function RootLayout(): React.JSX.Element {
     <SafeAreaProvider>
       <AppThemeProvider>
         <AuthProvider>
+        <AppLockProvider>
           <ExchangeRatesProvider>
             <RootNavigator />
           </ExchangeRatesProvider>
+          <LockScreen />
+          </AppLockProvider>
         </AuthProvider>
       </AppThemeProvider>
     </SafeAreaProvider>
