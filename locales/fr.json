@@ -178,7 +178,10 @@
   },
 
   "sendReview": {
+    "biometricPrompt": "Confirmez pour envoyer de l'argent",
     "confirm": "Confirmer et envoyer",
+    "confirmPinSubtitle": "Saisissez votre code PIN pour approuver ce transfert.",
+    "confirmPinTitle": "Confirmer le transfert",
     "exchangeRate": "Taux de change",
     "isReceiving": "en train de recevoir",
     "payerPhoneHint": "Vous recevrez une invitation sur ce numéro pour approuver le paiement.",

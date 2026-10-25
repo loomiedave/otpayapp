@@ -178,7 +178,10 @@
   },
 
   "sendReview": {
+    "biometricPrompt": "Confirm to send money",
     "confirm": "Confirm & Send",
+    "confirmPinSubtitle": "Enter your PIN to approve this transfer.",
+    "confirmPinTitle": "Confirm transfer",
     "exchangeRate": "Exchange rate",
     "isReceiving": "is receiving",
     "payerPhoneHint": "You'll get a prompt on this number to approve the payment.",

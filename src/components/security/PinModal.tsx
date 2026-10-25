@@ -15,12 +15,13 @@ import PinPad from '@/components/security/PinPad';
 interface PinModalProps {
   visible: boolean;
   mode: 'create' | 'verify';
+  title?: string; 
+  subtitle?: string;
   onClose: () => void;
   onSuccess: (pin: string) => void | Promise<void>;
 }
 
-export default function PinModal({ visible, mode, onClose, onSuccess }: PinModalProps): React.JSX.Element {
-  const { t } = useTranslation();
+export default function PinModal({ visible, mode, title: titleOverride, subtitle: subtitleOverride, onClose, onSuccess }: PinModalProps): React.JSX.Element {  const { t } = useTranslation();
   const { isDark } = useTheme();
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
@@ -76,10 +77,11 @@ export default function PinModal({ visible, mode, onClose, onSuccess }: PinModal
   };
 
   const title =
-    mode === 'verify' ? t('lock.verify_pin_title') : stage === 'enter' ? t('lock.create_pin_title') : t('lock.confirm_pin_title');
+    titleOverride ??
+    (mode === 'verify' ? t('lock.verify_pin_title') : stage === 'enter' ? t('lock.create_pin_title') : t('lock.confirm_pin_title'));
   const subtitle =
-    mode === 'verify' ? t('lock.verify_pin_subtitle') : stage === 'enter' ? t('lock.create_pin_subtitle') : t('lock.confirm_pin_subtitle');
-  const message = secondsLeft > 0 ? t('lock.locked_out', { time: formatSeconds(secondsLeft) }) : error;
+    subtitleOverride ??
+    (mode === 'verify' ? t('lock.verify_pin_subtitle') : stage === 'enter' ? t('lock.create_pin_subtitle') : t('lock.confirm_pin_subtitle')); const message = secondsLeft > 0 ? t('lock.locked_out', { time: formatSeconds(secondsLeft) }) : error;
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>

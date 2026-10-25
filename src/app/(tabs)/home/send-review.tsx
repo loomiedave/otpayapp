@@ -8,11 +8,13 @@ import { formatRate, formatAmount } from '@/lib/currency';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAppLock } from '@/contexts/AppLockContext';
 
 import { useCountries } from '@/hooks/useCountries';
 
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import PinModal from '@/components/security/PinModal';
 import ScreenHeader from '@/components/ui/ScreenHeader';
 import ScreenContainer from '@/components/ui/ScreenContainer';
 
@@ -21,9 +23,11 @@ export default function SendReviewScreen(): React.JSX.Element {
   const { session } = useAuth();
   const { t } = useTranslation();
   const { getCountry } = useCountries();
+  const [pinOpen, setPinOpen] = useState(false);
   const [payerPhone, setPayerPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { settings, authenticateBiometric } = useAppLock();
 
   const params = useLocalSearchParams<{
     recipientId: string;
@@ -54,7 +58,32 @@ export default function SendReviewScreen(): React.JSX.Element {
   const labelClass = isDark ? 'text-text-muted-dark text-sm' : 'text-text-muted text-sm';
   const valueClass = isDark ? 'text-text-main-dark font-semibold text-sm' : 'text-text-main font-semibold text-sm';
 
+const requestConfirm = async (): Promise<void> => {
+  if (isSubmitting) return;
+  if (!settings.pinEnabled && !settings.biometricEnabled) {
+    await handleConfirm();
+    return;
+  }
+
+  if (settings.biometricEnabled) {
+    const res = await authenticateBiometric(t('sendReview.biometricPrompt'), !settings.pinEnabled);
+    if (res.success) {
+      await handleConfirm();
+      return;
+    }
+    if (!settings.pinEnabled) return;
+  }
+
+  setPinOpen(true);
+};
+
+const handlePinApproved = async (): Promise<void> => {
+  setPinOpen(false);
+  setTimeout(() => { handleConfirm(); }, 400);
+};
+
   const handleConfirm = async (): Promise<void> => {
+    if (isSubmitting) return;
     if (isGhanaSource && !payerPhone.trim()) return;
     if (!session?.user?.id) return;
     setIsSubmitting(true);
@@ -85,13 +114,11 @@ export default function SendReviewScreen(): React.JSX.Element {
     }
 
     if (data.checkoutUrl) {
-      // Togo source (PayDunya) — needs the hosted checkout page
       router.replace({
         pathname: '/home/send-checkout',
         params: { transferId: data.transferId, checkoutUrl: data.checkoutUrl },
       });
     } else {
-      // Ghana source (MTN) — push prompt already sent, just poll
       router.replace({ pathname: '/home/send-waiting', params: { transferId: data.transferId } });
     }
   };
@@ -110,13 +137,16 @@ export default function SendReviewScreen(): React.JSX.Element {
       </View>
 
       <View className={`${cardClass} px-4`}>
+
         <View className={rowClass}>
           <Text className={labelClass}>{t('sendReview.youSend')}</Text>
           <Text className={valueClass}>{formatRate(numericAmount)} {fromCountry.currency_code}</Text>
         </View>
+
         <View className={rowClass}>
           <Text className={labelClass}>{t('sendReview.transferFee')}</Text>
-          <Text className={valueClass}>{formatRate(fee)} {fromCountry.currency_code}</Text>        </View>
+          <Text className={valueClass}>{formatRate(fee)} {fromCountry.currency_code}</Text>
+        </View>
         <View className="flex-row items-center justify-between py-3">
           <Text className={isDark ? 'text-text-main-dark font-bold' : 'text-text-main font-bold'}>{t('sendReview.total')}</Text>
           <Text className={isDark ? 'text-text-main-dark font-bold' : 'text-text-main font-bold'}>
@@ -151,11 +181,19 @@ export default function SendReviewScreen(): React.JSX.Element {
       <View className="mt-8">
         <Button
           label={t('sendReview.confirm')}
-          onPress={handleConfirm}
+          onPress={requestConfirm}
           loading={isSubmitting}
           disabled={isGhanaSource && !payerPhone.trim()}
         />
       </View>
+      <PinModal
+        visible={pinOpen}
+        mode="verify"
+        title={t('sendReview.confirmPinTitle')}
+        subtitle={t('sendReview.confirmPinSubtitle')}
+        onClose={() => setPinOpen(false)}
+        onSuccess={handlePinApproved}
+      />
     </ScreenContainer>
   );
 }
