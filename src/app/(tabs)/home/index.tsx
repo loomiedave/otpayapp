@@ -24,42 +24,41 @@ export default function HomeScreen(): React.JSX.Element {
   const { session } = useAuth();
   const { t } = useTranslation();
   const { rates, loading } = useExchangeRates();
-  const [to, setTo] = useState<CountryCode>('NG');
-  const [from, setFrom] = useState<CountryCode>('GH');
+  const [pair, setPair] = useState<{ from: CountryCode; to: CountryCode } | null>(null);
 
+  const active = rates.find((r) => r.is_active);
+  const from = pair?.from ?? active?.from;
+  const to = pair?.to ?? active?.to;
 
   const metadata = session?.user?.user_metadata as { first_name?: string } | undefined;
   const userName = metadata?.first_name ?? 'there';
 
-  const selected = rates.find((r) => r.from === from && r.to === to);
-  const tickerRates = rates.filter((r) => !(r.from === from && r.to === to));
+  const selected = from && to ? rates.find((r) => r.from === from && r.to === to) : undefined;
+  const tickerRates = rates.filter((r) => r !== selected);
 
   const handleSwap = (): void => {
-    setFrom(to);
-    setTo(from);
+    if (from && to) setPair({ from: to, to: from });
   };
-  const handleSelectPair = (nextFrom: CountryCode, nextTo: CountryCode): void => {
-    setFrom(nextFrom);
-    setTo(nextTo);
-  };
+  const handleSelectPair = (nextFrom: CountryCode, nextTo: CountryCode): void =>
+    setPair({ from: nextFrom, to: nextTo });
 
   if (loading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   return (
     <ScreenContainer scroll paddingHorizontal={false} extraBottomPadding={32} edges={['top']}>
       <HomeHeader userName={userName} />
-      <RateHero
-        from={from}
-        to={to}
-        rate={selected?.rate ?? 0}
-        fee={selected?.fee ?? 0}
-        updatedAt={selected?.updated_at ?? null}
-        onSwap={handleSwap}
-      />
+      {from && to && (
+        <RateHero
+          from={from}
+          to={to}
+          rate={selected?.rate ?? 0}
+          fee={selected?.fee ?? 0}
+          updatedAt={selected?.updated_at ?? null}
+          onSwap={handleSwap}
+        />
+      )}
       <View className="mt-4">
         <RateTicker rates={tickerRates} onSelect={handleSelectPair} />
       </View>

@@ -2,7 +2,7 @@ import * as Sharing from 'expo-sharing';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import ViewShot from 'react-native-view-shot';
-import * as MediaLibrary from 'expo-media-library';
+import * as MediaLibrary from 'expo-media-library/legacy';
 import CountryFlag from 'react-native-country-flag';
 import { useTranslation } from 'react-i18next';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -14,43 +14,31 @@ import { supabase } from '@/lib/supabase';
 import { formatRate } from '@/lib/currency';
 
 import { useCountries } from '@/hooks/useCountries';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 import { Transfer, TransferStatus } from '@/types/transactions';
 
-// CHANGED: light colours only (no more navy background)
-const BG = '#F1F5F9'; // page background, also the colour of the punched-out edges
-const CARD = '#FFFFFF'; // the receipt itself
-const INK = '#0B2A66'; // main text
-const LABEL = '#64748B'; // small grey labels
-const HAIRLINE = '#E2E8F0'; // thin divider lines
-const GOLD = '#D4A62B';
-const SCALLOP = 10; // CHANGED: was 14, smaller edge circles
+const SCALLOP = 10; // size of the punched-out circles on the card edges
 
-// CHANGED: "label" renamed to "labelKey": it holds a translation KEY, translated where it is shown
-const STATUS_META: Record<TransferStatus, { labelKey: string; color: string }> = {
-  pending_verification: { labelKey: 'transactionDetail.statusPendingVerification', color: '#B45309' },
-  confirmed: { labelKey: 'transactionDetail.statusConfirmed', color: '#B45309' },
-  paid_out: { labelKey: 'transactionDetail.statusPaidOut', color: '#15803D' },
-  failed: { labelKey: 'transactionDetail.statusFailed', color: '#B91C1C' },
+// Each status holds Tailwind class names from your theme:
+// "pill" = soft background (10% of the color), "text" = the color itself
+const STATUS_META: Record<TransferStatus, { labelKey: string; pill: string; text: string }> = {
+  pending_verification: { labelKey: 'transactionDetail.statusPendingVerification', pill: 'bg-warning/10', text: 'text-warning' },
+  confirmed: { labelKey: 'transactionDetail.statusConfirmed', pill: 'bg-warning/10', text: 'text-warning' },
+  paid_out: { labelKey: 'transactionDetail.statusPaidOut', pill: 'bg-success/10', text: 'text-success' },
+  failed: { labelKey: 'transactionDetail.statusFailed', pill: 'bg-danger/10', text: 'text-danger' },
 };
 
 const NETWORK_LABELS: Record<string, string> = { mtn: 'MTN MoMo', flooz: 'Flooz', tmoney: 'T-Money' };
 
-// NEW: one text style for all values, so sizes stay consistent
-const valueStyle = { color: INK, fontSize: 14, fontWeight: '600' as const };
-
-function initials(name: string): string {
-  return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase()).join('');
-}
-
 function formatStamp(iso: string, locale: string, t: (key: string, options?: any) => string): string {
   const d = new Date(iso);
   const date = d.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
-  const time = d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }); // CHANGED: seconds removed, shorter line
+  const time = d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
   return t('transactionDetail.dateAt', { date, time });
 }
 
-// NEW: money format. XOF has no decimals, others have 2. Follows the app language (French: 1 250,50)
+// XOF has no decimals, other currencies have 2. Follows the app language (French: 1 250,50)
 function formatAmount(value: number, currencyCode: string, locale: string): string {
   const decimals = currencyCode === 'XOF' ? 0 : 2;
   return value.toLocaleString(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
@@ -70,72 +58,58 @@ function Scallops({ edge }: { edge: 'top' | 'bottom' }) {
       }}
     >
       {Array.from({ length: 20 }).map((_, i) => (
-        // CHANGED: circles use the page colour (BG), so they look like holes punched in the card
-        <View key={i} style={{ width: SCALLOP, height: SCALLOP, borderRadius: SCALLOP / 2, backgroundColor: BG }} />
+        // The circles use the page color from your theme, so they look like holes in the card
+        <View
+          key={i}
+          className="bg-background-main"
+          style={{ width: SCALLOP, height: SCALLOP, borderRadius: SCALLOP / 2 }}
+        />
       ))}
     </View>
   );
 }
 
-// CHANGED: "Field" (label above value) became "Row" (label left, value right), much more compact
 function Row({ label, children, last }: { label: string; children: React.ReactNode; last?: boolean }) {
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 10,
-        borderBottomWidth: last ? 0 : 1,
-        borderBottomColor: HAIRLINE,
-      }}
-    >
-      <Text style={{ color: LABEL, fontSize: 13, marginRight: 16 }}>{label}</Text>
-      <View style={{ flex: 1, alignItems: 'flex-end' }}>{children}</View>
+    <View className={`flex-row items-center justify-between py-2.5 ${last ? '' : 'border-b border-border-main'}`}>
+      <Text className="text-text-muted text-xs mr-4">{label}</Text>
+      <View className="flex-1 items-end">{children}</View>
     </View>
   );
 }
 
-function Value({ children, color, size }: { children: React.ReactNode; color?: string; size?: number }) {
+// "className" lets you pass a theme class like "text-success"
+function Value({ children, className, small }: { children: React.ReactNode; className?: string; small?: boolean }) {
   return (
-    <Text style={[valueStyle, { textAlign: 'right' }, color ? { color } : null, size ? { fontSize: size } : null]}>
+    <Text className={`${small ? 'text-xs' : 'text-sm'} font-semibold text-right ${className ?? 'text-text-main'}`}>
       {children}
     </Text>
   );
 }
 
 function ActionPill({
-  icon, label, onPress, loading, disabled,
+  icon, label, onPress, loading, disabled, iconColor,
 }: {
   icon: keyof typeof Feather.glyphMap;
   label: string;
   onPress: () => void;
   loading: boolean;
   disabled: boolean;
+  iconColor: string;
 }) {
   return (
+    // Only className here (no function style), which avoids the NativeWind size bug from the PIN pad
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      style={({ pressed }) => ({
-        flex: 1,
-        height: 46, // CHANGED: was 50
-        borderRadius: 23,
-        backgroundColor: CARD,
-        borderWidth: 1, // CHANGED: thin border, because the page is now light
-        borderColor: HAIRLINE,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        opacity: pressed || disabled ? 0.7 : 1,
-      })}
+      className={`flex-1 h-12 rounded-full bg-background-card border border-border-main flex-row items-center justify-center active:opacity-70 ${disabled ? 'opacity-60' : ''}`}
     >
       {loading ? (
-        <ActivityIndicator size="small" color={INK} />
+        <ActivityIndicator size="small" color={iconColor} />
       ) : (
         <>
-          <Feather name={icon} size={16} color={INK} style={{ marginRight: 8 }} />
-          <Text style={{ color: INK, fontSize: 14, fontWeight: '600' }}>{label}</Text>
+          <Feather name={icon} size={16} color={iconColor} style={{ marginRight: 8 }} />
+          <Text className="text-text-main text-sm font-semibold">{label}</Text>
         </>
       )}
     </Pressable>
@@ -144,6 +118,7 @@ function ActionPill({
 
 export default function TransactionDetailScreen(): React.JSX.Element {
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
   const { t, i18n } = useTranslation();
   const { getCountry } = useCountries();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -166,6 +141,7 @@ export default function TransactionDetailScreen(): React.JSX.Element {
   };
 
   const handleShare = async (): Promise<void> => {
+    if (transfer?.status !== 'paid_out') return; // only completed transfers can be shared
     setBusy('share');
     try {
       const uri = await capture();
@@ -183,6 +159,7 @@ export default function TransactionDetailScreen(): React.JSX.Element {
   };
 
   const handleDownload = async (): Promise<void> => {
+    if (transfer?.status !== 'paid_out') return; // only completed transfers can be saved
     setBusy('download');
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync(true);
@@ -203,16 +180,15 @@ export default function TransactionDetailScreen(): React.JSX.Element {
 
   if (loading || !transfer) {
     return (
-      // CHANGED: light background, dark status bar icons
-      <View style={{ flex: 1, backgroundColor: BG, alignItems: 'center', justifyContent: 'center' }}>
+      <View className="flex-1 bg-background-main items-center justify-center">
         <StatusBar style="dark" />
         {loading ? (
-          <ActivityIndicator color={INK} />
+          <ActivityIndicator color={colors.primary} />
         ) : (
           <>
-            <Text style={{ color: INK, marginBottom: 16 }}>{t('transactionDetail.notFound')}</Text>
+            <Text className="text-text-main mb-4">{t('transactionDetail.notFound')}</Text>
             <Pressable onPress={() => router.back()}>
-              <Text style={{ color: INK, fontWeight: '700' }}>{t('transactionDetail.goBack')}</Text>
+              <Text className="text-primary font-bold">{t('transactionDetail.goBack')}</Text>
             </Pressable>
           </>
         )}
@@ -223,131 +199,134 @@ export default function TransactionDetailScreen(): React.JSX.Element {
   const toCountry = getCountry(transfer.to_country);
   const fromCountry = getCountry(transfer.from_country);
   const status = STATUS_META[transfer.status];
+  // NEW: a receipt only makes sense once the money has arrived ("Completed")
+  const canShareReceipt = transfer.status === 'paid_out';
   const reference = `TX-${transfer.id.slice(0, 8).toUpperCase()}`;
   const isSimulated = transfer.payout_reference?.startsWith('SIMULATED-') ?? false;
-  const locale = i18n.language; // NEW: used for dates and money
-  // CHANGED: rounded to cents so 100 + 2.1 can never show as 102.10000000000001
+  const locale = i18n.language;
   const total = Math.round((transfer.amount_sent + transfer.fee) * 100) / 100;
 
   return (
-    <View style={{ flex: 1, backgroundColor: BG }}>
+    <View className="flex-1 bg-background-main">
       <StatusBar style="dark" />
 
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 20, paddingTop: insets.top + 8, paddingBottom: 4 }}>
+      <View className="flex-row justify-end px-5 pb-1" style={{ paddingTop: insets.top + 8 }}>
         <Pressable
           onPress={() => router.back()}
           hitSlop={10}
           accessibilityRole="button"
           accessibilityLabel={t('lock.close')}
-          style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: '#CBD5E1', alignItems: 'center', justifyContent: 'center' }}
+          className="w-8 h-8 rounded-full border border-border-main items-center justify-center"
         >
-          <Feather name="x" size={16} color={INK} />
+          <Feather name="x" size={16} color={colors.iconMuted} />
         </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 12 }} showsVerticalScrollIndicator={false}>
-        {/* CHANGED: capture background is the light page colour, so the shared image is light too */}
-        <ViewShot ref={shotRef} options={{ format: 'png', quality: 1 }} style={{ backgroundColor: BG, padding: 16 }}>
-          <View style={{ backgroundColor: CARD, paddingHorizontal: 20, paddingVertical: 26 }}>
-            <Scallops edge="top" />
-            <Scallops edge="bottom" />
+        {/* ViewShot can't take className, so the page-colored wrapper is a normal View inside it.
+            This also makes the saved/shared image use the same light background. */}
+        <ViewShot ref={shotRef} options={{ format: 'png', quality: 1 }}>
+          <View className="bg-background-main p-4">
+            <View className="bg-background-card px-5 py-6">
+              <Scallops edge="top" />
+              <Scallops edge="bottom" />
 
-            {/* Header: logo on the left, status pill on the right */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                <Text style={{ fontSize: 24, fontWeight: '900', fontStyle: 'italic', color: INK, letterSpacing: -0.5 }}>Oti</Text>
-                <Text style={{ fontSize: 24, fontWeight: '900', fontStyle: 'italic', color: GOLD, letterSpacing: -0.5 }}>Pay</Text>
+              <View className="flex-row items-center justify-between">
+                <View className="flex-row items-baseline">
+                  {/* Logo colors come from your theme (primary + accent) */}
+                  <Text className="text-primary text-2xl font-black italic" style={{ letterSpacing: -0.5 }}>OT</Text>
+                  <Text className="text-accent text-2xl font-black italic" style={{ letterSpacing: -0.5 }}>Pay</Text>
+                </View>
+                <View className='rounded-full px-2.5 py-1'>
+                  <Text className={`${status.text} text-xs font-bold`}>{t(status.labelKey)}</Text>
+                </View>
               </View>
-              {/* NEW: status is a small coloured pill. "1A" makes the colour 10% see-through for the background */}
-              <View style={{ backgroundColor: `${status.color}1A`, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}>
-                <Text style={{ color: status.color, fontSize: 12, fontWeight: '700' }}>{t(status.labelKey)}</Text>
+
+              <Text className="text-text-main text-base font-extrabold mt-4">{t('transactionDetail.moneyTransfer')}</Text>
+              <Text className="text-text-muted text-xs mt-1">
+                {t('transactionDetail.refLine', { reference, stamp: formatStamp(transfer.created_at, locale, t) })}
+              </Text>
+
+              <View className="h-px bg-border-main my-3.5" />
+
+              <Text className="text-text-muted text-xs mb-2">{t('transactionDetail.recipient')}</Text>
+              <View className="flex-row items-center mb-1.5">
+                <View className="ml-3 flex-1">
+                  <Text className="text-text-main text-base font-bold">{transfer.recipient_name}</Text>
+                  <Text className="text-text-muted text-xs mt-0.5">{transfer.recipient_phone}</Text>
+                </View>
               </View>
-            </View>
 
-            {/* CHANGED: "Money Transfer" is translated now and smaller (was 26) */}
-            <Text style={{ fontSize: 17, fontWeight: '800', color: INK, marginTop: 18 }}>{t('transactionDetail.moneyTransfer')}</Text>
-            <Text style={{ fontSize: 12, color: LABEL, marginTop: 4 }}>
-              {t('transactionDetail.refLine', { reference, stamp: formatStamp(transfer.created_at, locale, t) })}
-            </Text>
-
-            <View style={{ height: 1, backgroundColor: HAIRLINE, marginTop: 14, marginBottom: 14 }} />
-
-            {/* CHANGED: recipient name and phone together in one block */}
-            <Text style={{ color: LABEL, fontSize: 12, marginBottom: 8 }}>{t('transactionDetail.recipient')}</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-              <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: '#EAF0FA', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: INK, fontWeight: '800', fontSize: 13 }}>{initials(transfer.recipient_name)}</Text>
-              </View>
-              <View style={{ marginLeft: 12, flex: 1 }}>
-                <Text style={{ color: INK, fontSize: 16, fontWeight: '700' }}>{transfer.recipient_name}</Text>
-                <Text style={{ color: LABEL, fontSize: 13, marginTop: 2 }}>{transfer.recipient_phone}</Text>
-              </View>
-            </View>
-
-            <Row label={t('transactionDetail.corridor')}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                {fromCountry.code ? <CountryFlag isoCode={fromCountry.code} size={14} /> : null}
-                <Text style={[valueStyle, { marginHorizontal: 6 }]}>{fromCountry.name}</Text>
-                <Feather name="arrow-right" size={13} color={INK} />
-                <View style={{ width: 6 }} />
-                {toCountry.code ? <CountryFlag isoCode={toCountry.code} size={14} /> : null}
-                <Text style={[valueStyle, { marginLeft: 6 }]}>{toCountry.name}</Text>
-              </View>
-            </Row>
-
-            {transfer.network ? (
-              <Row label={t('transactionDetail.network')}>
-                <Value>{NETWORK_LABELS[transfer.network] ?? transfer.network}</Value>
+              <Row label={t('transactionDetail.corridor')}>
+                <View className="flex-row items-center flex-wrap justify-end">
+                  {fromCountry.code ? <CountryFlag isoCode={fromCountry.code} size={14} /> : null}
+                  <Text className="text-text-main text-sm font-semibold mx-1.5">{fromCountry.name}</Text>
+                  <Feather name="arrow-right" size={13} color={colors.iconMuted} />
+                  <View style={{ width: 6 }} />
+                  {toCountry.code ? <CountryFlag isoCode={toCountry.code} size={14} /> : null}
+                  <Text className="text-text-main text-sm font-semibold ml-1.5">{toCountry.name}</Text>
+                </View>
               </Row>
-            ) : null}
 
-            {/* CHANGED: money now uses formatAmount, so 5000 XOF no longer shows as "5000.0" */}
-            <Row label={t('transactionDetail.amountSent')}>
-              <Value>{formatAmount(transfer.amount_sent, fromCountry.currency_code, locale)} {fromCountry.currency_code}</Value>
-            </Row>
+              {transfer.network ? (
+                <Row label={t('transactionDetail.network')}>
+                  <Value>{NETWORK_LABELS[transfer.network] ?? transfer.network}</Value>
+                </Row>
+              ) : null}
 
-            <Row label={t('transactionDetail.fee')}>
-              <Value>{formatAmount(transfer.fee, fromCountry.currency_code, locale)} {fromCountry.currency_code}</Value>
-            </Row>
-
-            <Row label={t('transactionDetail.exchangeRate')}>
-              <Value>1 {fromCountry.currency_code} = {formatRate(transfer.rate_used)} {toCountry.currency_code}</Value>
-            </Row>
-
-            <Row label={t('transactionDetail.recipientReceives')} last={!transfer.collection_reference && !transfer.payout_reference}>
-              <Value color="#15803D">{formatAmount(transfer.amount_received, toCountry.currency_code, locale)} {toCountry.currency_code}</Value>
-            </Row>
-
-            {transfer.collection_reference ? (
-              <Row label={t('transactionDetail.collectionReference')} last={!transfer.payout_reference}>
-                <Value size={12}>{transfer.collection_reference}</Value>
+              <Row label={t('transactionDetail.amountSent')}>
+                <Value>{formatAmount(transfer.amount_sent, fromCountry.currency_code, locale)} {fromCountry.currency_code}</Value>
               </Row>
-            ) : null}
 
-            {transfer.payout_reference ? (
-              <Row label={t('transactionDetail.payoutReference')} last>
-                <Value size={12} color={isSimulated ? '#B45309' : undefined}>{transfer.payout_reference}</Value>
+              <Row label={t('transactionDetail.fee')}>
+                <Value>{formatAmount(transfer.fee, fromCountry.currency_code, locale)} {fromCountry.currency_code}</Value>
               </Row>
-            ) : null}
 
-            <View style={{ height: 1, backgroundColor: HAIRLINE, marginTop: 6, marginBottom: 14 }} />
+              <Row label={t('transactionDetail.exchangeRate')}>
+                <Value>1 {fromCountry.currency_code} = {formatRate(transfer.rate_used)} {toCountry.currency_code}</Value>
+              </Row>
 
-            {/* CHANGED: total is one line (label left, amount right) and much smaller (was 44) */}
-            <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
-              <Text style={{ color: LABEL, fontSize: 13, fontWeight: '500' }}>{t('transactionDetail.totalAmount')}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                <Text style={{ color: INK, fontSize: 24, fontWeight: '800' }}>{formatAmount(total, fromCountry.currency_code, locale)}</Text>
-                <Text style={{ color: INK, fontSize: 14, fontWeight: '700', marginLeft: 6 }}>{fromCountry.currency_code}</Text>
+              <Row label={t('transactionDetail.recipientReceives')} last={!transfer.collection_reference && !transfer.payout_reference}>
+                <Value className="text-success">{formatAmount(transfer.amount_received, toCountry.currency_code, locale)} {toCountry.currency_code}</Value>
+              </Row>
+
+              {transfer.collection_reference ? (
+                <Row label={t('transactionDetail.collectionReference')} last={!transfer.payout_reference}>
+                  <Value small>{transfer.collection_reference}</Value>
+                </Row>
+              ) : null}
+
+              {transfer.payout_reference ? (
+                <Row label={t('transactionDetail.payoutReference')} last>
+                  <Value small className={isSimulated ? 'text-warning' : undefined}>{transfer.payout_reference}</Value>
+                </Row>
+              ) : null}
+
+              <View className="h-px bg-border-main mt-1.5 mb-3.5" />
+
+              <View className="flex-row items-baseline justify-between">
+                <Text className="text-text-muted text-sm font-medium">{t('transactionDetail.totalAmount')}</Text>
+                <View className="flex-row items-baseline">
+                  <Text className="text-text-main text-2xl font-extrabold">{formatAmount(total, fromCountry.currency_code, locale)}</Text>
+                  <Text className="text-text-main text-sm font-bold ml-1.5">{fromCountry.currency_code}</Text>
+                </View>
               </View>
             </View>
           </View>
         </ViewShot>
       </ScrollView>
 
-      <View style={{ flexDirection: 'row', gap: 12, paddingHorizontal: 20, paddingTop: 8, paddingBottom: insets.bottom + 12 }}>
-        <ActionPill icon="download" label={t('transactionDetail.download')} onPress={handleDownload} loading={busy === 'download'} disabled={busy !== null} />
-        <ActionPill icon="share-2" label={t('transactionDetail.share')} onPress={handleShare} loading={busy === 'share'} disabled={busy !== null} />
-      </View>
+      {/* CHANGED: buttons only for completed transfers, otherwise a short note */}
+      {canShareReceipt ? (
+        <View className="flex-row px-5 pt-2" style={{ gap: 12, paddingBottom: insets.bottom + 12 }}>
+          <ActionPill icon="download" label={t('transactionDetail.download')} onPress={handleDownload} loading={busy === 'download'} disabled={busy !== null} iconColor={colors.primary} />
+          <ActionPill icon="share-2" label={t('transactionDetail.share')} onPress={handleShare} loading={busy === 'share'} disabled={busy !== null} iconColor={colors.primary} />
+        </View>
+      ) : (
+        <View className="px-5 pt-2" style={{ paddingBottom: insets.bottom + 16 }}>
+          <Text className="text-text-muted text-xs text-center">{t('transactionDetail.receiptUnavailable')}</Text>
+        </View>
+      )}
     </View>
   );
 }

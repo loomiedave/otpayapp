@@ -35,6 +35,7 @@
     "my_activity": "My activity",
     "no_fee_transfer": "No fee on this transfer",
     "quick_actions": "Quick actions",
+    "rate_line": "{{amount}} {{from}} = {{converted}} {{to}}",
     "recent_transactions": "Recent transactions",
     "see_all": "See all",
     "send_money": "Send money",
@@ -47,7 +48,7 @@
 
   "lock": {
     "attempts_left": "Incorrect PIN. Attempts left: {{count}}",
-    "biometric_prompt": "Unlock OtiPay",
+    "biometric_prompt": "Unlock OTPay",
     "close": "Close",
     "confirm_pin_subtitle": "Enter the same PIN again.",
     "confirm_pin_title": "Confirm your PIN",
@@ -60,7 +61,7 @@
     "forgot_pin_confirm_title": "Sign out?",
     "locked_out": "Too many attempts. Try again in {{time}}.",
     "locked_subtitle": "Verify it's you to continue.",
-    "locked_title": "OtiPay is locked",
+    "locked_title": "OTPay is locked",
     "pin_too_simple": "Choose a less obvious PIN.",
     "pins_do_not_match": "PINs do not match. Try again.",
     "unlock_biometric": "Unlock",
@@ -213,10 +214,13 @@
 
   "support": {
     "empty_chat": "Send a message and our team will reply here.",
+    "contact_us": "CONTACT US",
+    "faq": "FREQUENTLY ASKED QUESTIONS",
     "help_and_contact": "Help and contact",
     "help_subtitle": "Read FAQs, email and call us",
     "live_chat": "Live chat",
     "talk_to_support": "Talk to our support team",
+    "title": "Help & Support",
     "type_a_message": "Type a message..."
   },
 
@@ -240,6 +244,7 @@
     "recipient": "Recipient",
     "recipientNumber": "Recipient number",
     "recipientReceives": "Recipient receives",
+    "receiptUnavailable": "A receipt is available once the transfer is completed.",
     "refLine": "Ref: {{reference}}  |  {{stamp}}",
     "retryMessage": "Please try again.",
     "savedMessage": "Receipt saved to your photos.",
@@ -260,6 +265,6 @@
     "choose_documents": "Choose from our list of acceptable documents to submit",
     "identity_verification": "Identity verification",
     "identity_verified": "Identity verified",
-    "verify_account_prompt": "Verify your OtiPay account by submitting your details"
+    "verify_account_prompt": "Verify your OTPay account by submitting your details"
   }
 }

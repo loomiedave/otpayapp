@@ -35,6 +35,7 @@
     "my_activity": "Mon activité",
     "no_fee_transfer": "Aucun frais sur ce transfert",
     "quick_actions": "Actions rapides",
+    "rate_line": "{{amount}} {{from}} = {{converted}} {{to}}",
     "recent_transactions": "Transactions récentes",
     "see_all": "Voir tout",
     "send_money": "Envoyer",
@@ -47,7 +48,7 @@
 
   "lock": {
     "attempts_left": "PIN incorrect. Tentatives restantes : {{count}}",
-    "biometric_prompt": "Déverrouiller OtiPay",
+    "biometric_prompt": "Déverrouiller OTPay",
     "close": "Fermer",
     "confirm_pin_subtitle": "Saisissez à nouveau le même code PIN.",
     "confirm_pin_title": "Confirmez votre code PIN",
@@ -60,7 +61,7 @@
     "forgot_pin_confirm_title": "Se déconnecter ?",
     "locked_out": "Trop de tentatives. Réessayez dans {{time}}.",
     "locked_subtitle": "Confirmez votre identité pour continuer.",
-    "locked_title": "OtiPay est verrouillé",
+    "locked_title": "OTPay est verrouillé",
     "pin_too_simple": "Choisissez un code PIN moins évident.",
     "pins_do_not_match": "Les codes PIN ne correspondent pas. Réessayez.",
     "unlock_biometric": "Déverrouiller",
@@ -212,11 +213,14 @@
   },
 
   "support": {
+    "contact_us": "CONTACTEZ NOUS",
     "empty_chat": "Envoyez un message et notre équipe vous répondra ici.",
+     "faq": "QUESTIONS FRÉQUENTES",
     "help_and_contact": "Aide et contact",
     "help_subtitle": "Consultez la FAQ, écrivez-nous ou appelez-nous",
     "live_chat": "Chat en direct",
     "talk_to_support": "Parlez à notre équipe d'assistance",
+    "title": "Aide et support",
     "type_a_message": "Écrire un message..."
   },
 
@@ -240,6 +244,7 @@
     "recipient": "Bénéficiaire",
     "recipientNumber": "Numéro du bénéficiaire",
     "recipientReceives": "Le bénéficiaire reçoit",
+    "receiptUnavailable": "Un reçu est disponible une fois le transfert terminé.",
     "refLine": "Réf. : {{reference}}  |  {{stamp}}",
     "retryMessage": "Veuillez réessayer.",
     "savedMessage": "Reçu enregistré dans vos photos.",
@@ -260,6 +265,6 @@
     "choose_documents": "Choisissez parmi notre liste de documents acceptés",
     "identity_verification": "Vérification d'identité",
     "identity_verified": "Identité vérifiée",
-    "verify_account_prompt": "Vérifiez votre compte OtiPay en soumettant vos informations"
+    "verify_account_prompt": "Vérifiez votre compte OTPay en soumettant vos informations"
   }
 }

@@ -6,11 +6,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTranslation } from 'react-i18next';
 
-const NAVY = '#0E2F6B';
-const GOLD = '#D4A62B';
-const INACTIVE = 'rgba(255,255,255,0.78)';
+import { useTheme } from '@/contexts/ThemeContext'; // NEW: to know if the app is in dark mode
+import { useThemeColors } from '@/hooks/useThemeColors'; // NEW: icon colors from your theme
 
-// Raises the middle tab (Markets) as the gold floating button, like Mixx's scan button.
+// CHANGED: the NAVY, GOLD and INACTIVE constants are gone. Colors now come from your Tailwind theme.
+
+// Raises the middle tab (Markets) as the floating button, like Mixx's scan button.
 // Set to false for five equal tabs.
 const RAISE_CENTER = true;
 
@@ -18,6 +19,8 @@ type TabBarProps = Parameters<NonNullable<React.ComponentProps<typeof Tabs>['tab
 
 function CustomTabBar({ state, descriptors, navigation }: TabBarProps): React.JSX.Element {
   const insets = useSafeAreaInsets();
+  const { isDark } = useTheme(); // NEW
+  const colors = useThemeColors(); // NEW
 
   const visible = state.routes
     .map((route, index) => ({ route, index }))
@@ -26,18 +29,22 @@ function CustomTabBar({ state, descriptors, navigation }: TabBarProps): React.JS
   const hasCenter = RAISE_CENTER && visible.length % 2 === 1;
   const centerPosition = Math.floor(visible.length / 2);
 
+  // NEW: theme classes for the bar, in light and dark mode
+  const barClass = isDark
+    ? 'bg-background-card-dark border-t border-border-main-dark'
+    : 'bg-background-card border-t border-border-main';
+
   return (
     <View
+      // CHANGED: background and top border come from the theme (className) instead of the NAVY constant
+      className={`flex-row items-center ${barClass}`}
       style={{
-        backgroundColor: NAVY,
         borderTopLeftRadius: 28,
         borderTopRightRadius: 28,
         paddingTop: 10,
         paddingBottom: Math.max(insets.bottom, 10),
-        flexDirection: 'row',
-        alignItems: 'center',
         shadowColor: '#000',
-        shadowOpacity: 0.18,
+        shadowOpacity: 0.1,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: -4 },
         elevation: 16,
@@ -46,16 +53,23 @@ function CustomTabBar({ state, descriptors, navigation }: TabBarProps): React.JS
       {visible.map(({ route, index }, position) => {
         const { options } = descriptors[route.key];
         const focused = state.index === index;
-        const color = focused ? GOLD : INACTIVE;
         const label = typeof options.title === 'string' ? options.title : route.name;
         const isCenter = hasCenter && position === centerPosition;
 
-        const icon =
-          options.tabBarIcon?.({
-            focused,
-            color: isCenter ? NAVY : color,
-            size: isCenter ? 26 : 22,
-          }) ?? <Feather name="circle" size={22} color={color} />;
+        // CHANGED: icon color from the theme (blue when active, muted grey when not)
+        const iconColor = focused ? colors.primary : colors.iconMuted;
+
+        // CHANGED: label color from the theme classes
+        const labelClass = focused
+          ? isDark ? 'text-primary-dark' : 'text-primary'
+          : isDark ? 'text-text-muted-dark' : 'text-text-muted';
+
+        // CHANGED: the center tab no longer needs an icon, it shows "OT" instead (see below)
+        const icon = isCenter
+          ? null
+          : options.tabBarIcon?.({ focused, color: iconColor, size: 22 }) ?? (
+              <Feather name="circle" size={22} color={iconColor} />
+            );
 
         const onPress = () => {
           const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
@@ -79,6 +93,7 @@ function CustomTabBar({ state, descriptors, navigation }: TabBarProps): React.JS
             {isCenter ? (
               <>
                 <View
+                  className="bg-accent items-center justify-center"
                   style={{
                     position: 'absolute',
                     top: -34,
@@ -86,28 +101,24 @@ function CustomTabBar({ state, descriptors, navigation }: TabBarProps): React.JS
                     marginLeft: -31,
                     width: 62,
                     height: 62,
-                    backgroundColor: GOLD,
-                    borderTopLeftRadius: 31,
-                    borderTopRightRadius: 31,
-                    borderBottomLeftRadius: 31,
-                    borderBottomRightRadius: 10,
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    borderRadius: 31,
                     shadowColor: '#000',
-                    shadowOpacity: 0.3,
+                    shadowOpacity: 0.25,
                     shadowRadius: 8,
                     shadowOffset: { width: 0, height: 4 },
                     elevation: 10,
                   }}
                 >
-                  {icon}
+                  <Text className="text-text-main text-2xl font-black italic" style={{ letterSpacing: -1 }}>
+                    OT
+                  </Text>
                 </View>
                 <View style={{ height: 22 }} />
               </>
             ) : (
               icon
             )}
-            <Text style={{ color, fontSize: 11, fontWeight: focused ? '700' : '500', marginTop: 4 }}>
+            <Text className={labelClass} style={{ fontSize: 11, fontWeight: focused ? '700' : '500', marginTop: 4 }}>
               {label}
             </Text>
           </Pressable>
@@ -140,6 +151,7 @@ export default function TabsLayout(): React.JSX.Element {
         name="markets"
         options={{
           title: `${t('nav.markets')}`,
+          // The icon below is no longer shown (the "OT" mark replaces it), but it is harmless to keep
           tabBarIcon: ({ color, size }) => <Feather name="activity" size={size} color={color} />,
         }}
       />
